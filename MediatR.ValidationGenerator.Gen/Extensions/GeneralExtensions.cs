@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace MediatR.ValidationGenerator.Gen.Extensions
+{
+    internal static class GeneralExtensions
+    {
+        public static bool IsNotNull(this object obj)
+        {
+            return !(obj is null);
+        }
+
+        public static bool None<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
+        {
+            return !collection.Any(predicate);
+        }
+
+        public static TProperty With<T, TProperty>(this T self, Func<T, TProperty> propertyFunction,
+            TProperty defaultValue = default) where T : class
+        {
+            if (self == default(T))
+            {
+                return defaultValue;
+            }
+            return propertyFunction(self);
+        }
+
+        public static bool NotEndsWith(this string str, string endStr)
+        {
+            return !str.EndsWith(endStr);
+        }
+    }
+}
