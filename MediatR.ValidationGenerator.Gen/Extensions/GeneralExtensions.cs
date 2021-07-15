@@ -7,6 +7,15 @@ namespace MediatR.ValidationGenerator.Gen.Extensions
 {
     internal static class GeneralExtensions
     {
+        public static bool IsEmpty(this string str)
+        {
+            return String.IsNullOrEmpty(str);
+        }
+        public static bool IsNotEmpty(this string str)
+        {
+            return !str.IsEmpty();
+        }
+
         public static bool IsNotNull(this object obj)
         {
             return !(obj is null);

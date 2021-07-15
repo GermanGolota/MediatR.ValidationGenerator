@@ -21,13 +21,15 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _initialLeftMargin = initialLeftMargin;
         }
 
-        public void AppendLine(string line, int margin = 0)
+        public MethodBodyBuilder AppendLine(string line, int margin = 0)
         {
             if (line.NotEndsWith(";"))
             {
                 line = $"{line};";
             }
             _lineToLength.Add(new KeyValuePair<string, int>(line, margin));
+
+            return this;
         }
 
         public string Build()
@@ -50,10 +52,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         private static void AppendMargin(StringBuilder lineBuilder, int margin)
         {
-            for (int i = 0; i < margin; i++)
-            {
-                lineBuilder.Append("\t");
-            }
+            lineBuilder.Repeat("\t", margin);
         }
     }
 }
