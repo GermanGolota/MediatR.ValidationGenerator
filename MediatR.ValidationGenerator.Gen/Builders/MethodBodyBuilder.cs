@@ -36,7 +36,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         {
             StringBuilder sb = new StringBuilder();
             AppendMargin(sb, _initialLeftMargin);
-            sb.Append("{\n");
+            sb.AppendLine("{");
             foreach (var linePair in _lineToLength)
             {
                 StringBuilder lineBuilder = new StringBuilder();

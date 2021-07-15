@@ -11,7 +11,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests
         {
             //Arrange
             var builder = new MethodBodyBuilder();
-            string expectedBody = "{\n\tvar a = 3;\r\n\tvar b = 4;\r\n\t\tvar c = a + b;\r\n}\r\n";
+            string expectedBody = "{\r\n\tvar a = 3;\r\n\tvar b = 4;\r\n\t\tvar c = a + b;\r\n}\r\n";
             //Act
             builder.AppendLine("var a = 3;")
                 .AppendLine("var b = 4;")
