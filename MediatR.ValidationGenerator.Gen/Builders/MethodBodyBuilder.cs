@@ -46,6 +46,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 lineBuilder.Append(line);
                 sb.AppendLine(lineBuilder.ToString());
             }
+            AppendMargin(sb, _initialLeftMargin);
             sb.AppendLine("}");
             return sb.ToString();
         }

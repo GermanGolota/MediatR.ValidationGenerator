@@ -19,6 +19,14 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>(); //Type to param name
 
         private MethodBodyBuilder _body;
+        private MethodBodyBuilder GetBody()
+        {
+            if(_body is null)
+            {
+                _body = new MethodBodyBuilder(_leftMargin);
+            }
+            return _body;
+        }
 
         public MethodBuilder()
         {
@@ -106,10 +114,8 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 }
                 else
                 {
-                    _body ??= new MethodBodyBuilder();
-
                     string signature = BuildSignature();
-                    string body = _body.Build();
+                    string body = GetBody().Build();
 
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine(signature);
