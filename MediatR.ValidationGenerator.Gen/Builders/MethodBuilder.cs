@@ -141,9 +141,4 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return parameterStr;
         }
     }
-
-    public enum AccessModifier
-    {
-        Public, Private, Protected
-    }
 }
