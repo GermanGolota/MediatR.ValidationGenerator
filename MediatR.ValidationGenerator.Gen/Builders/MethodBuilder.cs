@@ -30,6 +30,18 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _leftMargin = margin;
         }
 
+        public MethodBuilder WithMargin(int margin)
+        {
+            _leftMargin = margin;
+            return this;
+        }
+
+        public MethodBuilder IncreaseMargin(int margin)
+        {
+            _leftMargin += margin;
+            return this;
+        }
+
         public MethodBuilder WithName(string name)
         {
             _methodName = name;
@@ -46,42 +58,36 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         public MethodBuilder WithReturnType(string type)
         {
             _returnType = type;
-
             return this;
         }
 
         public MethodBuilder WithParameter(string type, string parameterName)
         {
             _parameters.Add(new KeyValuePair<string, string>(type, parameterName));
-
             return this;
         }
 
         public MethodBuilder AsOverride()
         {
             _isOverride = true;
-
             return this;
         }
 
         public MethodBuilder AsStatic()
         {
             _isStatic = true;
-
             return this;
         }
 
         public MethodBuilder WithModifier(AccessModifier modifier)
         {
             _modifier = modifier;
-
             return this;
         }
 
         public MethodBuilder AppendLine(string line)
         {
             _body.AppendLine(line);
-
             return this;
         }
 
@@ -120,7 +126,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             string overrideText = _isOverride ? "override " : "";
             string staticText = _isStatic ? "static " : "";
             StringBuilder signatureBuilder = new StringBuilder();
-            signatureBuilder.Repeat("\t", _leftMargin);
+            signatureBuilder.Repeat(BuilderConstants.TAB, _leftMargin);
             signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{_returnType} {_methodName}");
             signatureBuilder.Append("(");
             string parameterStr = BuildParameters();

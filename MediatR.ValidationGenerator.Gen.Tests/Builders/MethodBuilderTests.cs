@@ -23,7 +23,13 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithBody()
                     .AppendLine("return a + b");
 
-            string expectedMethod = "public int Sum(int a, int b)\r\n{\r\n\treturn a + b;\r\n}\r\n";
+            string expectedMethod = @"
+public int Sum(int a, int b)
+{
+    return a + b;
+}
+"
+.RemoveFirstNewLine();
             //Act
             ValueOrNull<string> actualMethod = builder.Build();
             //Assert

@@ -10,7 +10,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private readonly int _initialLeftMargin = 0;
 
         private List<KeyValuePair<string, int>> _lineToLength = new List<KeyValuePair<string, int>>();
-
+        
         public MethodBodyBuilder()
         {
 
@@ -52,7 +52,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         private static void AppendMargin(StringBuilder lineBuilder, int margin)
         {
-            lineBuilder.Repeat("\t", margin);
+            lineBuilder.Repeat(BuilderConstants.TAB, margin);
         }
     }
 }
