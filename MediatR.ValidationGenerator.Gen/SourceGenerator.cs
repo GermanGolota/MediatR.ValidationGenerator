@@ -25,8 +25,11 @@ namespace MediatR.ValidationGenerator.Gen
             var validationModels = ValidationModelCreator.GetValidationModels(classContext, requestClasses);
             foreach (var validationModel in validationModels)
             {
-                var source = RequestValidatorCreator.CreateValidatorFor(validationModel);
-                context.AddSource(validationModel.ValidatorName, source);
+                var creationResult = RequestValidatorCreator.CreateValidatorFor(validationModel);
+                if (creationResult.HasValue)
+                {
+                    context.AddSource(validationModel.ValidatorName, creationResult.Value);
+                }
             }
         }
     }

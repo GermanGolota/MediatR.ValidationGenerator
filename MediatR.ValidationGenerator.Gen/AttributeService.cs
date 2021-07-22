@@ -17,18 +17,18 @@ namespace MediatR.ValidationGenerator.Gen
             return _supportedAttributes.Contains(attribute.Name.ToString());
         }
 
-        public static string CreateRuleForAttribute(AttributeSyntax attribute)
+        public static ValueOrNull<string> CreateRuleForAttribute(AttributeSyntax attribute)
         {
             string attributeName = attribute.Name.ToString();
 
-            string result;
+            ValueOrNull<string> result;
             switch (attributeName)
             {
                 case "Required":
                     result = ".NotEmpty()";
                     break;
                 default:
-                    result = "";
+                    result = ValueOrNull<string>.CreateNull("Unsupported attribute");
                     break;
             }
             return result;
