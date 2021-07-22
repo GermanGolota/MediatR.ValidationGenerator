@@ -4,7 +4,7 @@ using Xunit;
 
 namespace MediatR.ValidationGenerator.Gen.Tests
 {
-    public class MethodBodyBuilderTest
+    public class MethodBodyBuilderTests
     {
         [Fact]
         public void Build_ShouldAddAllLines()
