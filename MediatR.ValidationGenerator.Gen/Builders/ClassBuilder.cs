@@ -1,4 +1,5 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
-    public class ClassBuilder
+    public class ClassBuilder : ValidatingBuilder
     {
         private List<string> _implementsList = new List<string>();
         private List<string> _usedNamespaces = new List<string>();
@@ -58,24 +59,6 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         {
             _implementsList.Add(className);
             return this;
-        }
-
-        public string Build()
-        {
-            StringBuilder classBuilder = new StringBuilder();
-
-            string namespaces = BuildUsings(_usedNamespaces);
-            classBuilder.Append(namespaces);
-
-            classBuilder.AppendLine();
-
-            classBuilder.AppendLine($"namespace {_classNamespace}");
-            classBuilder.AppendLine("{");
-            string classBody = BuildClassBody();
-            classBuilder.Append(classBody);
-            classBuilder.AppendLine("}");
-
-            return classBuilder.ToString();
         }
 
         private string BuildClassBody()
@@ -132,6 +115,45 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 namespaceBuilder.AppendLine(usedNamespace);
             }
             return namespaceBuilder.ToString();
+        }
+
+        protected override string BuildInner()
+        {
+            StringBuilder classBuilder = new StringBuilder();
+
+            string namespaces = BuildUsings(_usedNamespaces);
+            classBuilder.Append(namespaces);
+
+            classBuilder.AppendLine();
+
+            classBuilder.AppendLine($"namespace {_classNamespace}");
+            classBuilder.AppendLine("{");
+            string classBody = BuildClassBody();
+            classBuilder.Append(classBody);
+            classBuilder.AppendLine("}");
+
+            return classBuilder.ToString();
+        }
+
+        public override SuccessOrFailure Validate()
+        {
+            SuccessOrFailure result;
+            if (_className.IsEmpty())
+            {
+                result = SuccessOrFailure.CreateFailure("Can't create class without name");
+            }
+            else
+            {
+                if (_classNamespace.IsEmpty())
+                {
+                    result = SuccessOrFailure.CreateFailure("Can't create class in no namespace");
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
     }
 }

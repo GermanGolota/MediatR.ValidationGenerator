@@ -23,8 +23,9 @@ namespace MediatR.ValidationGenerator.Gen.Tests
                 .AppendLine("var b = 4;")
                 .AppendLine("var c = a + b;", 1);
 
-            string actualBody = builder.Build();
+            var actualBody = builder.Build();
             //Assert
+            Assert.True(actualBody.HasValue);
             Assert.Equal(expectedBody, actualBody);
         }
     }

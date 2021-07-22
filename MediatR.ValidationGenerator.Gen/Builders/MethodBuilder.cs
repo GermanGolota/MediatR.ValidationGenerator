@@ -1,11 +1,12 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
-    public class MethodBuilder
+    public class MethodBuilder : ValidatingBuilder
     {
         private int _leftMargin;
 
@@ -21,7 +22,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private MethodBodyBuilder _body;
         private MethodBodyBuilder GetBody()
         {
-            if(_body is null)
+            if (_body is null)
             {
                 _body = new MethodBodyBuilder(_leftMargin);
             }
@@ -99,34 +100,6 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public ValueOrNull<string> Build()
-        {
-            ValueOrNull<string> result;
-            if (_methodName.IsEmpty())
-            {
-                result = ValueOrNull<string>.CreateNull("Can't create method with no name");
-            }
-            else
-            {
-                if (_returnType.IsEmpty())
-                {
-                    result = ValueOrNull<string>.CreateNull("Can't create method with no return type");
-                }
-                else
-                {
-                    string signature = BuildSignature();
-                    string body = GetBody().Build();
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine(signature);
-                    sb.Append(body);
-
-                    result = sb.ToString();
-                }
-            }
-            return result;
-        }
-
         private string BuildSignature()
         {
             string overrideText = _isOverride ? "override " : "";
@@ -151,6 +124,42 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             }
             string parameterStr = String.Join(", ", parameters);
             return parameterStr;
+        }
+
+        protected override string BuildInner()
+        {
+            string signature = BuildSignature();
+            var body = GetBody().Build();
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(signature);
+            if (body.HasValue)
+            {
+                sb.Append(body.Value);
+            }
+
+            return sb.ToString();
+        }
+
+        public override SuccessOrFailure Validate()
+        {
+            SuccessOrFailure result;
+            if (_methodName.IsEmpty())
+            {
+                result = SuccessOrFailure.CreateFailure("Can't create method with no name");
+            }
+            else
+            {
+                if (_returnType.IsEmpty())
+                {
+                    result = SuccessOrFailure.CreateFailure("Can't create method with no return type");
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
     }
 }

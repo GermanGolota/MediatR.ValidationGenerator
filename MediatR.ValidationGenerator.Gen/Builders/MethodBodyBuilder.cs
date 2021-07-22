@@ -1,16 +1,16 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
-using System;
+﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
-    public class MethodBodyBuilder
+    public class MethodBodyBuilder : IBuilder
     {
         private readonly int _initialLeftMargin = 0;
 
         private List<KeyValuePair<string, int>> _lineToLength = new List<KeyValuePair<string, int>>();
-        
+
         public MethodBodyBuilder()
         {
 
@@ -32,7 +32,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public string Build()
+        public ValueOrNull<string> Build()
         {
             StringBuilder sb = new StringBuilder();
             AppendMargin(sb, _initialLeftMargin);
