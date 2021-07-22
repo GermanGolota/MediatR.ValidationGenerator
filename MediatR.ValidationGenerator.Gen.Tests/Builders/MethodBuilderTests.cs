@@ -20,8 +20,11 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithName("Sum")
                 .WithParameter("int", "a")
                 .WithParameter("int", "b")
-                .WithBody()
-                    .AppendLine("return a + b");
+                .WithBody((initialMargin) =>
+                {
+                    return new MethodBodyBuilder(initialMargin)
+                        .AppendLine("return a + b");
+                });
 
             string expectedMethod = @"
 public int Sum(int a, int b)

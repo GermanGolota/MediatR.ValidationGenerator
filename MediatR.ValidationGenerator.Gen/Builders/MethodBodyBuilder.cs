@@ -7,7 +7,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 {
     public class MethodBodyBuilder : IBuilder
     {
-        private readonly int _initialLeftMargin = 0;
+        private int _initialLeftMargin = 0;
 
         private List<KeyValuePair<string, int>> _lineToLength = new List<KeyValuePair<string, int>>();
 

@@ -19,9 +19,9 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithNamespace("TestNamespace")
                 .WithAccessModifier(AccessModifier.Public)
                 .WithClassName("Test")
-                .WithMethod(()=>
+                .WithMethod((initialMargin)=>
                 {
-                    return new MethodBuilder()
+                    return new MethodBuilder(initialMargin)
                         .WithModifier(AccessModifier.Public)
                         .WithName("DoNothing")
                         .WithReturnType("void");
@@ -37,8 +37,6 @@ namespace TestNamespace
         {
         }
 
-
-
     }
 }
 ".RemoveFirstNewLine();
@@ -46,7 +44,7 @@ namespace TestNamespace
             var actualClass = builder.Build();
             //Assert
             Assert.True(actualClass.HasValue);
-            Assert.Equal(expectedClass, actualClass);
+            Assert.Equal(expectedClass, actualClass.Value);
         }
     }
 }

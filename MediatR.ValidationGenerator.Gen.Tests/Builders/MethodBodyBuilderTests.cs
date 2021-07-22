@@ -2,7 +2,7 @@ using MediatR.ValidationGenerator.Gen.Builders;
 using System;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Gen.Tests
+namespace MediatR.ValidationGenerator.Gen.Tests.Builders
 {
     public class MethodBodyBuilderTests
     {

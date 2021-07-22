@@ -76,9 +76,10 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public MethodBuilder WithBody()
+        public MethodBuilder WithBody(Func<int, MethodBodyBuilder> builder)
         {
-            _body = new MethodBodyBuilder(_leftMargin);
+            var body = builder(_leftMargin);
+            _body = body;
             return this;
         }
 
@@ -118,10 +119,40 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public MethodBuilder AppendLine(string line)
+        public override SuccessOrFailure Validate()
         {
-            _body.AppendLine(line);
-            return this;
+            SuccessOrFailure result;
+            if (_methodName.IsEmpty())
+            {
+                result = SuccessOrFailure.CreateFailure("Can't create method with no name");
+            }
+            else
+            {
+                if (_returnType.IsEmpty())
+                {
+                    result = SuccessOrFailure.CreateFailure("Can't create method with no return type");
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        protected override string BuildInner()
+        {
+            string signature = BuildSignature();
+            var body = GetBody().Build();
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(signature);
+            if (body.HasValue)
+            {
+                sb.Append(body.Value);
+            }
+
+            return sb.ToString();
         }
 
         private string BuildSignature()
@@ -152,42 +183,6 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 parameters.Add(parameterStr);
             }
             return String.Join(", ", parameters);
-        }
-
-        protected override string BuildInner()
-        {
-            string signature = BuildSignature();
-            var body = GetBody().Build();
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine(signature);
-            if (body.HasValue)
-            {
-                sb.Append(body.Value);
-            }
-
-            return sb.ToString();
-        }
-
-        public override SuccessOrFailure Validate()
-        {
-            SuccessOrFailure result;
-            if (_methodName.IsEmpty())
-            {
-                result = SuccessOrFailure.CreateFailure("Can't create method with no name");
-            }
-            else
-            {
-                if (_returnType.IsEmpty())
-                {
-                    result = SuccessOrFailure.CreateFailure("Can't create method with no return type");
-                }
-                else
-                {
-                    result = true;
-                }
-            }
-            return result;
         }
     }
 }

@@ -36,17 +36,12 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _classNamespace = classNamespace;
             return this;
         }
-
-        public ClassBuilder WithMethod(MethodBuilder method)
+       
+        public ClassBuilder WithMethod(Func<int, MethodBuilder> methodBuilder)
         {
-            method.IncreaseMargin(2);
+            var method = methodBuilder(2);
             _methods.Add(method);
             return this;
-        }
-
-        public ClassBuilder WithMethod(Func<MethodBuilder> methodBuilder)
-        {
-            return WithMethod(methodBuilder());
         }
 
         public ClassBuilder UsingNamespace(string usedNamespace)
@@ -82,8 +77,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 var methodBuildResult = method.Build();
                 if (methodBuildResult.HasValue)
                 {
-                    classBodyBuilder.AppendLine(methodBuildResult.Value);
-                    classBodyBuilder.AppendLine();
+                    classBodyBuilder.Append(methodBuildResult.Value);
                 }
             }
             return classBodyBuilder.ToString();
