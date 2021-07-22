@@ -6,6 +6,24 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
+    public class MethodParameter
+    {
+        public MethodParameter(string type, string name)
+        {
+            Type = type;
+            Name = name;
+        }
+
+        public MethodParameter(string type, string name, string defaultValue) : this(type, name)
+        {
+            DefaultValue = defaultValue;
+        }
+
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string DefaultValue { get; set; }
+    }
+
     public class MethodBuilder : ValidatingBuilder
     {
         private int _leftMargin;
@@ -17,7 +35,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private string _methodName;
         private AccessModifier _modifier = AccessModifier.Public;
 
-        private List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>(); //Type to param name
+        private List<MethodParameter> _parameters = new List<MethodParameter>();
 
         private MethodBodyBuilder _body;
         private MethodBodyBuilder GetBody()
@@ -72,7 +90,13 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         public MethodBuilder WithParameter(string type, string parameterName)
         {
-            _parameters.Add(new KeyValuePair<string, string>(type, parameterName));
+            _parameters.Add(new MethodParameter(type, parameterName));
+            return this;
+        }
+
+        public MethodBuilder WithParameter(string type, string parameterName, string defaultValue)
+        {
+            _parameters.Add(new MethodParameter(type, parameterName, defaultValue));
             return this;
         }
 
@@ -120,10 +144,14 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             List<string> parameters = new List<string>();
             foreach (var parameter in _parameters)
             {
-                parameters.Add($"{parameter.Key} {parameter.Value}");
+                string parameterStr = $"{parameter.Type} {parameter.Name}";
+                if (parameter.DefaultValue.IsNotEmpty())
+                {
+                    parameterStr += $" = {parameter.DefaultValue}";
+                }
+                parameters.Add(parameterStr);
             }
-            string parameterStr = String.Join(", ", parameters);
-            return parameterStr;
+            return String.Join(", ", parameters);
         }
 
         protected override string BuildInner()
