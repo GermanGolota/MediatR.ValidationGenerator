@@ -36,7 +36,6 @@ namespace TestNamespace
         public void DoNothing()
         {
         }
-
     }
 }
 ".RemoveFirstNewLine();

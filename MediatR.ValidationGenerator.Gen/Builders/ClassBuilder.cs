@@ -13,6 +13,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private List<string> _usedNamespaces = new List<string>();
 
         private List<MethodBuilder> _methods = new List<MethodBuilder>();
+        private ClassConstructorBuilder _constructor;
 
         private string _className;
         private AccessModifier _modifier = AccessModifier.Public;
@@ -35,11 +36,17 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _classNamespace = classNamespace;
             return this;
         }
-       
+
         public ClassBuilder WithMethod(Func<int, MethodBuilder> methodBuilder)
         {
             var method = methodBuilder(2);
             _methods.Add(method);
+            return this;
+        }
+
+        public ClassBuilder WithConstructor(Func<int, ClassConstructorBuilder> constructorBuilder)
+        {
+            _constructor = constructorBuilder(2);
             return this;
         }
 
@@ -61,10 +68,26 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             string signature = BuildSignature(_modifier, _className, _implementsList);
             classBodyBuilder.AppendLine($"{BuilderUtils.TAB}{signature}");
             classBodyBuilder.AppendLine(BuilderUtils.TAB + "{");
+            var ctor = BuildConstructor();
+            classBodyBuilder.Append(ctor);
             string methods = BuildMethods(_methods);
-            classBodyBuilder.AppendLine(methods);
+            classBodyBuilder.Append(methods);
             classBodyBuilder.AppendLine(BuilderUtils.TAB + "}");
             return classBodyBuilder.ToString();
+        }
+
+        private string BuildConstructor()
+        {
+            string result = "";
+            if (_constructor.IsNotNull())
+            {
+                var buildResult = _constructor.Build();
+                if (buildResult.HasValue)
+                {
+                    result = buildResult.Value;
+                }
+            }
+            return result;
         }
 
         [Pure]
