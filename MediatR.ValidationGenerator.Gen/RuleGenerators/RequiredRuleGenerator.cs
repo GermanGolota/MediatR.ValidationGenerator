@@ -18,28 +18,35 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
         public ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute)
         {
             string result = ".NotEmpty()";
-            var arguments = attribute.ArgumentList?.Arguments;
+            string customeErrorMessage = GetCustomeErrorMessageOrNull(attribute);
+            if (customeErrorMessage.IsNotEmpty())
+            {
+                result += $".WithMessage(\"{customeErrorMessage}\")";
+            }
+            return result;
+        }
 
+        private static string GetCustomeErrorMessageOrNull(AttributeSyntax attribute)
+        {
+            string customeErrorMessage = null;
+            var arguments = attribute.ArgumentList?.Arguments;
             if (arguments.HasValue)
             {
-                var errorMessage = arguments.Value
-                                    .Where(x => x.NameEquals.Name.Identifier.ToString() == "ErrorMessage")
-                                    .FirstOrDefault();
+                var errorMessages = arguments.Value
+                                    .Where(x => x.NameEquals.Name.Identifier.ToString() == "ErrorMessage");
 
-                if (errorMessage != default)
+                if (errorMessages.Any())
                 {
+                    var errorMessage = errorMessages.First();
                     var expression = errorMessage.Expression as LiteralExpressionSyntax;
                     if (expression.IsNotNull())
                     {
-                        string actualMessage = expression.Token.Value?.ToString();
-                        if (actualMessage.IsNotEmpty())
-                        {
-                            result += $".WithMessage(\"{actualMessage}\")";
-                        }
+                        customeErrorMessage = expression.Token.Value?.ToString();
                     }
                 }
             }
-            return result;
+
+            return customeErrorMessage;
         }
     }
 }
