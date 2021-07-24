@@ -28,6 +28,16 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         #endregion
 
+        public ClassConstructorBuilder()
+        {
+
+        }
+
+        public ClassConstructorBuilder(int margin)
+        {
+            _leftMargin = margin;
+        }
+
         #region BuildAccessors
         public ClassConstructorBuilder WithClassName(string className)
         {
@@ -80,6 +90,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         {
             StringBuilder constructorBuilder = new StringBuilder();
             string signature = BuildSignature();
+            constructorBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             constructorBuilder.AppendLine(signature);
             var body = GetBody().Build();
             if (body.HasValue)

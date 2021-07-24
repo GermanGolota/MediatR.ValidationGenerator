@@ -11,7 +11,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
     public class ClassBuilderTests
     {
         [Fact]
-        public void Build_ShouldBuild()
+        public void Build_ShouldBuild_WhenAllRequirementsAreProvided()
         {
             //Arrange
             var builder = new ClassBuilder()
@@ -19,7 +19,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithNamespace("TestNamespace")
                 .WithAccessModifier(AccessModifier.Public)
                 .WithClassName("Test")
-                .WithMethod((initialMargin)=>
+                .WithMethod((initialMargin) =>
                 {
                     return new MethodBuilder(initialMargin)
                         .WithModifier(AccessModifier.Public)
@@ -44,6 +44,38 @@ namespace TestNamespace
             //Assert
             Assert.True(actualClass.HasValue);
             Assert.Equal(expectedClass, actualClass.Value);
+        }
+
+        [Fact]
+        public void Build_ShouldBuildWithConstructor()
+        {
+            //Arrange
+            var classBuilder = new ClassBuilder()
+                                .WithAccessModifier(AccessModifier.Public)
+                                .WithClassName("Test")
+                                .WithNamespace("TestName")
+                                .WithConstructor((margin) =>
+                                {
+                                    return new ClassConstructorBuilder(margin)
+                                        .WithClassName("Test")
+                                        .WithModifier(AccessModifier.Public);
+                                });
+            string expected = @"
+namespace TestName
+{
+    public class Test
+    {
+        public Test()
+        {
+        }
+    }
+}
+".RemoveFirstNewLine();
+            //Act
+            var actual = classBuilder.Build();
+            //Assert
+            Assert.True(actual.HasValue);
+            Assert.Equal(expected, actual.Value);
         }
     }
 }

@@ -139,8 +139,10 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
             string namespaces = BuildUsings(_usedNamespaces);
             classBuilder.Append(namespaces);
-
-            classBuilder.AppendLine();
+            if (namespaces.IsNotEmpty())
+            {
+                classBuilder.AppendLine();
+            }
 
             classBuilder.AppendLine($"namespace {_classNamespace}");
             classBuilder.AppendLine("{");
