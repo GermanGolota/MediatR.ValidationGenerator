@@ -1,18 +1,17 @@
 ﻿using MediatR.ValidationGenerator.Gen.Extensions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.RuleGenerators
 {
     public class RequiredRuleGenerator : IRuleGenerator
     {
+        private readonly string _requiredAttributeName = AttributeHelper.GetProperName(nameof(RequiredAttribute));
         public bool IsMatchingAttribute(AttributeSyntax attribute)
         {
             string attributeName = attribute.Name.ToString();
-            return attributeName == "Required";
+            return attributeName == _requiredAttributeName;
         }
 
         public ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute)
