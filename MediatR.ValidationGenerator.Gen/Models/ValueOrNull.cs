@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MediatR.ValidationGenerator.Gen
+﻿namespace MediatR.ValidationGenerator.Gen.Models
 {
     public struct ValueOrNull<T>
     {
@@ -32,7 +26,6 @@ namespace MediatR.ValidationGenerator.Gen
                 NullMessage = nullMessage
             };
         }
-
 
         public static implicit operator ValueOrNull<T>(T value)
         {

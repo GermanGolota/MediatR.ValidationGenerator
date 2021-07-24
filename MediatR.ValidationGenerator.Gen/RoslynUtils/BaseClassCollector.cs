@@ -50,31 +50,19 @@ namespace MediatR.ValidationGenerator.Gen.RoslynUtils
             var baseTypes = desiredClass.BaseList?.Types;
             if (baseTypes.HasValue)
             {
-                foreach (var baseClass in baseTypes)
+                var baseTypeNames = baseTypes.Value
+                    .Select(x => x.Type)
+                    .OfType<SimpleNameSyntax>();
+
+                foreach (var baseTypeName in baseTypeNames)
                 {
-                    var type = baseClass.Type;
-                    var name = type as SimpleNameSyntax;
-                    if (name.IsNotNull())
+                    string baseName = baseTypeName.Identifier.Text;
+                    TypeDeclarationSyntax baseClassSyntax = classContext
+                        .FirstOrDefault(localClass => SyntaxUtils.IsTheSameClassNameOrGeneric(baseName, localClass.Identifier.Text));
+
+                    if (baseClassSyntax.IsNotNull())
                     {
-                        var identifier = name.Identifier;
-                        string baseTypeName = identifier.Text;
-
-                        TypeDeclarationSyntax baseClassSyntax = null;
-
-                        foreach (var localClass in classContext)
-                        {
-                            var localClassName = localClass.Identifier.Text;
-                            if (SyntaxUtils.IsTheSameClassNameOrGeneric(baseTypeName, localClassName))
-                            {
-                                baseClassSyntax = localClass;
-                                break;
-                            }
-                        }
-
-                        if (baseClassSyntax.IsNotNull())
-                        {
-                            baseClasses.Add(baseClassSyntax);
-                        }
+                        baseClasses.Add(baseClassSyntax);
                     }
                 }
             }

@@ -40,5 +40,10 @@ namespace MediatR.ValidationGenerator.Gen.Extensions
         {
             return !str.EndsWith(endStr);
         }
+
+        public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source)
+        {
+            return source.SelectMany(x => x);
+        }
     }
 }

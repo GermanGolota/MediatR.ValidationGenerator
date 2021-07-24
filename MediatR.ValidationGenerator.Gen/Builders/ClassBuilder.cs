@@ -1,5 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
 using MediatR.ValidationGenerator.Gen.Extensions;
+using MediatR.ValidationGenerator.Gen.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -13,11 +14,11 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private List<string> _usedNamespaces = new List<string>();
 
         private List<MethodBuilder> _methods = new List<MethodBuilder>();
+        private ClassConstructorBuilder _constructor;
 
         private string _className;
         private AccessModifier _modifier = AccessModifier.Public;
         private string _classNamespace;
-
 
         public ClassBuilder WithClassName(string className)
         {
@@ -36,11 +37,20 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _classNamespace = classNamespace;
             return this;
         }
-       
-        public ClassBuilder WithMethod(Func<int, MethodBuilder> methodBuilder)
+
+        public ClassBuilder WithMethod(Func<MethodBuilder, MethodBuilder> methodBuilder)
         {
-            var method = methodBuilder(2);
+            MethodBuilder initial = new MethodBuilder(2);
+            var method = methodBuilder(initial);
             _methods.Add(method);
+            return this;
+        }
+
+        public ClassBuilder WithConstructor(Func<ClassConstructorBuilder, ClassConstructorBuilder> constructorBuilder)
+        {
+            var initalCtor = new ClassConstructorBuilder(2)
+                .WithClassName(this._className);
+            _constructor = constructorBuilder(initalCtor);
             return this;
         }
 
@@ -60,12 +70,28 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         {
             StringBuilder classBodyBuilder = new StringBuilder();
             string signature = BuildSignature(_modifier, _className, _implementsList);
-            classBodyBuilder.AppendLine($"{BuilderConstants.TAB}{signature}");
-            classBodyBuilder.AppendLine(BuilderConstants.TAB + "{");
+            classBodyBuilder.AppendLine($"{BuilderUtils.TAB}{signature}");
+            classBodyBuilder.AppendLine(BuilderUtils.TAB + "{");
+            var ctor = BuildConstructor();
+            classBodyBuilder.Append(ctor);
             string methods = BuildMethods(_methods);
-            classBodyBuilder.AppendLine(methods);
-            classBodyBuilder.AppendLine(BuilderConstants.TAB + "}");
+            classBodyBuilder.Append(methods);
+            classBodyBuilder.AppendLine(BuilderUtils.TAB + "}");
             return classBodyBuilder.ToString();
+        }
+
+        private string BuildConstructor()
+        {
+            string result = "";
+            if (_constructor.IsNotNull())
+            {
+                var buildResult = _constructor.Build();
+                if (buildResult.HasValue)
+                {
+                    result = buildResult.Value;
+                }
+            }
+            return result;
         }
 
         [Pure]
@@ -117,8 +143,10 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
             string namespaces = BuildUsings(_usedNamespaces);
             classBuilder.Append(namespaces);
-
-            classBuilder.AppendLine();
+            if (namespaces.IsNotEmpty())
+            {
+                classBuilder.AppendLine();
+            }
 
             classBuilder.AppendLine($"namespace {_classNamespace}");
             classBuilder.AppendLine("{");

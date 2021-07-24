@@ -1,4 +1,4 @@
-﻿namespace MediatR.ValidationGenerator.Gen
+﻿namespace MediatR.ValidationGenerator.Gen.Models
 {
     public struct SuccessOrFailure
     {

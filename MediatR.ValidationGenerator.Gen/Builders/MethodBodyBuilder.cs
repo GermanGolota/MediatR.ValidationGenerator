@@ -1,5 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
 using MediatR.ValidationGenerator.Gen.Extensions;
+using MediatR.ValidationGenerator.Gen.Models;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,9 +22,9 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             _initialLeftMargin = initialLeftMargin;
         }
 
-        public MethodBodyBuilder AppendLine(string line, int margin = 0)
+        public MethodBodyBuilder AppendLine(string line, int margin = 0, bool endLine = true)
         {
-            if (line.NotEndsWith(";"))
+            if (endLine && line.NotEndsWith(";"))
             {
                 line = $"{line};";
             }
@@ -53,7 +54,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         private static void AppendMargin(StringBuilder lineBuilder, int margin)
         {
-            lineBuilder.Repeat(BuilderConstants.TAB, margin);
+            lineBuilder.Repeat(BuilderUtils.TAB, margin);
         }
     }
 }

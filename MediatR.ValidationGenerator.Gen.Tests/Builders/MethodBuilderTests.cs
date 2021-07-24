@@ -1,4 +1,5 @@
 ﻿using MediatR.ValidationGenerator.Gen.Builders;
+using MediatR.ValidationGenerator.Gen.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,9 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithName("Sum")
                 .WithParameter("int", "a")
                 .WithParameter("int", "b")
-                .WithBody((initialMargin) =>
+                .WithBody((body) =>
                 {
-                    return new MethodBodyBuilder(initialMargin)
+                    return body
                         .AppendLine("return a + b");
                 });
 
