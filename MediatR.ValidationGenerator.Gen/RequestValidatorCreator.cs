@@ -34,7 +34,7 @@ namespace MediatR.ValidationGenerator.Gen
                                  {
                                      var prop = entry.Key;
                                      var attributes = entry.Value;
-                                     methodBuilder.AppendLine($"RuleFor(x => x.{prop.Identifier})");
+                                     methodBuilder.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
 
                                      foreach (var attribute in attributes)
                                      {
