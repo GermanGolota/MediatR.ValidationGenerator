@@ -20,24 +20,22 @@ namespace MediatR.ValidationGenerator.Gen
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("FluentValidation")
                      .Implementing($"AbstractValidator<{requestClassName}>")
-                     .WithMethod((initialMargin) =>
+                     .WithMethod((method) =>
                      {
-                         return new MethodBuilder(initialMargin)
+                         return method
                              .AsOverride()
                              //.AsAsync()
                              .WithReturnType("Task<ValidationResult>")
                              .WithName("ValidateAsync")
                              .WithParameter($"ValidationContext<{requestClassName}>", "context")
                              .WithParameter("CancellationToken", "cancellation", "default")
-                             .WithBody((initialMarginBody) =>
+                             .WithBody((body) =>
                              {
-                                 var methodBuilder = new MethodBodyBuilder(initialMarginBody);
-
                                  foreach (var entry in model.PropertyToSupportedAttributes)
                                  {
                                      var prop = entry.Key;
                                      var attributes = entry.Value;
-                                     methodBuilder.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
+                                     body.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
 
                                      List<string> rules = attributes
                                                     .Select(attribute => AttributeService.CreateRulesForAttribute(attribute))
@@ -48,13 +46,13 @@ namespace MediatR.ValidationGenerator.Gen
                                      {
                                          bool isLastRule = i == rules.Count - 1;
                                          var rule = rules[i];
-                                         methodBuilder.AppendLine(rule, 1, isLastRule);
+                                         body.AppendLine(rule, 1, isLastRule);
                                      }
                                  }
 
-                                 methodBuilder.AppendLine("return base.ValidateAsync(context, cancellation)");
+                                 body.AppendLine("return base.ValidateAsync(context, cancellation)");
 
-                                 return methodBuilder;
+                                 return body;
                              });
                      });
 

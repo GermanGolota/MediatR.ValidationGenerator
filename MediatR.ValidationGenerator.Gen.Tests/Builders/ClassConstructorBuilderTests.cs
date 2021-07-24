@@ -18,9 +18,9 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                                         .WithClassName("Test")
                                         .WithParameter("int", "margin")
                                         .WithModifier(AccessModifier.Public)
-                                        .WithBody((margin) =>
+                                        .WithBody((body) =>
                                         {
-                                            return new MethodBodyBuilder(margin)
+                                            return body
                                                 .AppendLine("var a = 2 + margin");
                                         });
             string expected = @"

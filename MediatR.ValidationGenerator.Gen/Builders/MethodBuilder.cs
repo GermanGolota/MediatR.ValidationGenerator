@@ -59,9 +59,10 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public MethodBuilder WithBody(Func<int, MethodBodyBuilder> builder)
+        public MethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
         {
-            var body = builder(_leftMargin);
+            var initialBody = new MethodBodyBuilder(_leftMargin);
+            var body = builder(initialBody);
             _body = body;
             return this;
         }

@@ -19,12 +19,12 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithNamespace("TestNamespace")
                 .WithAccessModifier(AccessModifier.Public)
                 .WithClassName("Test")
-                .WithMethod((initialMargin) =>
+                .WithMethod((method) =>
                 {
-                    return new MethodBuilder(initialMargin)
-                        .WithModifier(AccessModifier.Public)
-                        .WithName("DoNothing")
-                        .WithReturnType("void");
+                    return method
+                            .WithModifier(AccessModifier.Public)
+                            .WithName("DoNothing")
+                            .WithReturnType("void");
                 });
             string expectedClass = @"
 using System;
@@ -54,10 +54,9 @@ namespace TestNamespace
                                 .WithAccessModifier(AccessModifier.Public)
                                 .WithClassName("Test")
                                 .WithNamespace("TestName")
-                                .WithConstructor((margin) =>
+                                .WithConstructor((ctor) =>
                                 {
-                                    return new ClassConstructorBuilder(margin)
-                                        .WithClassName("Test")
+                                    return ctor
                                         .WithModifier(AccessModifier.Public);
                                 });
             string expected = @"

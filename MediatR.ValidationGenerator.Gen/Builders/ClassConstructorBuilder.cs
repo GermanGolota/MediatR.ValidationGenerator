@@ -64,10 +64,10 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public ClassConstructorBuilder WithBody(Func<int, MethodBodyBuilder> builder)
+        public ClassConstructorBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
         {
-            var body = builder(_leftMargin);
-            _body = body;
+            var initial = new MethodBodyBuilder(_leftMargin);
+            _body = builder(initial);
             return this;
         }
         #endregion

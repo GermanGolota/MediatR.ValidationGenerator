@@ -37,16 +37,19 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             return this;
         }
 
-        public ClassBuilder WithMethod(Func<int, MethodBuilder> methodBuilder)
+        public ClassBuilder WithMethod(Func<MethodBuilder, MethodBuilder> methodBuilder)
         {
-            var method = methodBuilder(2);
+            MethodBuilder initial = new MethodBuilder(2);
+            var method = methodBuilder(initial);
             _methods.Add(method);
             return this;
         }
 
-        public ClassBuilder WithConstructor(Func<int, ClassConstructorBuilder> constructorBuilder)
+        public ClassBuilder WithConstructor(Func<ClassConstructorBuilder, ClassConstructorBuilder> constructorBuilder)
         {
-            _constructor = constructorBuilder(2);
+            var initalCtor = new ClassConstructorBuilder(2)
+                .WithClassName(this._className);
+            _constructor = constructorBuilder(initalCtor);
             return this;
         }
 
