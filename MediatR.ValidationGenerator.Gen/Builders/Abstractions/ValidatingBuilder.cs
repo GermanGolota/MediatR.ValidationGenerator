@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MediatR.ValidationGenerator.Gen.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

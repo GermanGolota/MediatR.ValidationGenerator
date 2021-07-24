@@ -1,5 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
 using MediatR.ValidationGenerator.Gen.Extensions;
+using MediatR.ValidationGenerator.Gen.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

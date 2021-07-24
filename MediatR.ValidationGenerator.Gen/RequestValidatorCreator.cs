@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using MediatR.ValidationGenerator.Gen.Builders;
 using MediatR.ValidationGenerator.Gen.Extensions;
+using MediatR.ValidationGenerator.Gen.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
