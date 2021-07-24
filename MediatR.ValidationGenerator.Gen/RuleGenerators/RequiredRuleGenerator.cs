@@ -38,10 +38,9 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
                 if (errorMessages.Any())
                 {
                     var errorMessage = errorMessages.First();
-                    var expression = errorMessage.Expression as LiteralExpressionSyntax;
-                    if (expression.IsNotNull())
+                    if (errorMessage.Expression is LiteralExpressionSyntax literalSyntax)
                     {
-                        customeErrorMessage = expression.Token.Value?.ToString();
+                        customeErrorMessage = literalSyntax.Token.Value?.ToString();
                     }
                 }
             }

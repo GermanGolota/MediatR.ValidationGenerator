@@ -53,7 +53,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         private static void AppendMargin(StringBuilder lineBuilder, int margin)
         {
-            lineBuilder.Repeat(BuilderConstants.TAB, margin);
+            lineBuilder.Repeat(BuilderUtils.TAB, margin);
         }
     }
 }

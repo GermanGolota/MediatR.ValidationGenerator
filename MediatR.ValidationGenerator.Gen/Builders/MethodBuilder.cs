@@ -6,23 +6,6 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
-    public class MethodParameter
-    {
-        public MethodParameter(string type, string name)
-        {
-            Type = type;
-            Name = name;
-        }
-
-        public MethodParameter(string type, string name, string defaultValue) : this(type, name)
-        {
-            DefaultValue = defaultValue;
-        }
-
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public string DefaultValue { get; set; }
-    }
 
     public class MethodBuilder : ValidatingBuilder
     {
@@ -160,29 +143,14 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             string overrideText = _isOverride ? "override " : "";
             string staticText = _isStatic ? "static " : "";
             StringBuilder signatureBuilder = new StringBuilder();
-            signatureBuilder.Repeat(BuilderConstants.TAB, _leftMargin);
+            signatureBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{_returnType} {_methodName}");
             signatureBuilder.Append("(");
-            string parameterStr = BuildParameters();
+            string parameterStr = BuilderUtils.BuildParameterList(_parameters);
             signatureBuilder.Append(parameterStr);
             signatureBuilder.Append(")");
             string signature = signatureBuilder.ToString();
             return signature;
-        }
-
-        private string BuildParameters()
-        {
-            List<string> parameters = new List<string>();
-            foreach (var parameter in _parameters)
-            {
-                string parameterStr = $"{parameter.Type} {parameter.Name}";
-                if (parameter.DefaultValue.IsNotEmpty())
-                {
-                    parameterStr += $" = {parameter.DefaultValue}";
-                }
-                parameters.Add(parameterStr);
-            }
-            return String.Join(", ", parameters);
         }
     }
 }

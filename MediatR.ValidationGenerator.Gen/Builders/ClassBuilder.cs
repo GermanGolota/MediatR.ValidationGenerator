@@ -18,7 +18,6 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private AccessModifier _modifier = AccessModifier.Public;
         private string _classNamespace;
 
-
         public ClassBuilder WithClassName(string className)
         {
             _className = className;
@@ -60,11 +59,11 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         {
             StringBuilder classBodyBuilder = new StringBuilder();
             string signature = BuildSignature(_modifier, _className, _implementsList);
-            classBodyBuilder.AppendLine($"{BuilderConstants.TAB}{signature}");
-            classBodyBuilder.AppendLine(BuilderConstants.TAB + "{");
+            classBodyBuilder.AppendLine($"{BuilderUtils.TAB}{signature}");
+            classBodyBuilder.AppendLine(BuilderUtils.TAB + "{");
             string methods = BuildMethods(_methods);
             classBodyBuilder.AppendLine(methods);
-            classBodyBuilder.AppendLine(BuilderConstants.TAB + "}");
+            classBodyBuilder.AppendLine(BuilderUtils.TAB + "}");
             return classBodyBuilder.ToString();
         }
 
