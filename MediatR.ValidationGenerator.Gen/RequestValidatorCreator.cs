@@ -24,7 +24,7 @@ namespace MediatR.ValidationGenerator.Gen
                              //.AsAsync()
                              .WithReturnType("Task<ValidationResult>")
                              .WithName("ValidateAsync")
-                             .WithParameter("ValidationContext<string>", "context")
+                             .WithParameter($"ValidationContext<{requestClassName}>", "context")
                              .WithParameter("CancellationToken", "cancellation", "default")
                              .WithBody((initialMarginBody) =>
                              {
@@ -53,19 +53,6 @@ namespace MediatR.ValidationGenerator.Gen
                      });
 
             return classBuilder.Build();
-        }
-    }
-
-
-    public class Validator : AbstractValidator<string>
-    {
-        public override Task<ValidationResult> ValidateAsync(
-            ValidationContext<string> context,
-            CancellationToken cancellation = default)
-        {
-            RuleFor(x => x.Length)
-                .NotEmpty();
-            return base.ValidateAsync(context, cancellation);
         }
     }
 }
