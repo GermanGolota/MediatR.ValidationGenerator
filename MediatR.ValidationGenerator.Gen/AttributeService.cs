@@ -8,26 +8,18 @@ namespace MediatR.ValidationGenerator.Gen
 {
     public static class AttributeService
     {
-        private static List<IRuleGenerator> _generators;
-
-        static AttributeService()
-        {
-            _generators = new List<IRuleGenerator>()
-            {
-                new RequiredRuleGenerator()
-            };
-        }
-
         public static bool AttributeIsSupported(AttributeSyntax attribute)
         {
-            return _generators.Any(x => x.IsMatchingAttribute(attribute));
+            var generators = RuleGeneratorsCollector.Collect();
+            return generators.Any(x => x.IsMatchingAttribute(attribute));
         }
 
         //TODO: Support for multiple rules for one attribute
         public static ValueOrNull<string> CreateRuleForAttribute(AttributeSyntax attribute)
         {
             ValueOrNull<string> result = ValueOrNull<string>.CreateNull("Unsupported attribute");
-            foreach (var generator in _generators)
+            var generators = RuleGeneratorsCollector.Collect();
+            foreach (var generator in generators)
             {
                 if (generator.IsMatchingAttribute(attribute))
                 {
