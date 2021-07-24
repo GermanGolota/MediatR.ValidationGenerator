@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR.ValidationGenerator.Gen.Builders;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -38,15 +39,10 @@ namespace MediatR.ValidationGenerator.Gen
                                      var attributes = entry.Value;
                                      methodBuilder.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
 
-                                     List<string> rules = new List<string>();
-                                     foreach (var attribute in attributes)
-                                     {
-                                         var attributeRule = AttributeService.CreateRuleForAttribute(attribute);
-                                         if (attributeRule.HasValue)
-                                         {
-                                             rules.Add(attributeRule.Value);
-                                         }
-                                     }
+                                     List<string> rules = attributes
+                                                    .Select(attribute => AttributeService.CreateRulesForAttribute(attribute))
+                                                    .Flatten()
+                                                    .ToList();
 
                                      for (int i = 0; i < rules.Count; i++)
                                      {

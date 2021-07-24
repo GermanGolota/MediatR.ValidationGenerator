@@ -14,20 +14,22 @@ namespace MediatR.ValidationGenerator.Gen
             return generators.Any(x => x.IsMatchingAttribute(attribute));
         }
 
-        //TODO: Support for multiple rules for one attribute
-        public static ValueOrNull<string> CreateRuleForAttribute(AttributeSyntax attribute)
+        public static IEnumerable<string> CreateRulesForAttribute(AttributeSyntax attribute)
         {
-            ValueOrNull<string> result = ValueOrNull<string>.CreateNull("Unsupported attribute");
+            List<string> rules = new List<string>();
             var generators = RuleGeneratorsCollector.Collect();
             foreach (var generator in generators)
             {
                 if (generator.IsMatchingAttribute(attribute))
                 {
-                    result = generator.GenerateRuleFor(attribute);
-                    break;
+                    var rule = generator.GenerateRuleFor(attribute);
+                    if (rule.HasValue)
+                    {
+                        rules.Add(rule.Value);
+                    }
                 }
             }
-            return result;
+            return rules;
         }
     }
 }
