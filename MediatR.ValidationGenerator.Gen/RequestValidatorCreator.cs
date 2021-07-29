@@ -18,9 +18,9 @@ namespace MediatR.ValidationGenerator.Gen
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("FluentValidation")
                      .Implementing($"AbstractValidator<{requestClassName}>")
-                     .WithMethod((initialMargin) =>
+                     .WithMethod((builder) =>
                      {
-                         return new MethodBuilder(initialMargin)
+                         return builder
                              .AsOverride()
                              //.AsAsync()
                              .WithReturnType("Task<ValidationResult>")
