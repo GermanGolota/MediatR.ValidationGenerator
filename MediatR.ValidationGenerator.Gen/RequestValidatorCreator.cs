@@ -20,6 +20,7 @@ namespace MediatR.ValidationGenerator.Gen
                      .WithClassName(model.ValidatorName)
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("FluentValidation")
+                     .UsingNamespace("System")
                      .Implementing($"AbstractValidator<{requestClassName}>")
                      .WithConstructor(ctor =>
                      {

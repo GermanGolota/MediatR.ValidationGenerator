@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -19,7 +20,38 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
 
         public ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute)
         {
-            return null;
+            var arguments = attribute.With(x => x.ArgumentList).With(x => x.Arguments);
+            ValueOrNull<string> result;
+            if (arguments.IsNotNull())
+            {
+                string regex = GetRegex(arguments);
+                if (regex.IsNotEmpty())
+                {
+                    result = @$".Must(value => Regex.IsMatch(value.ToString(), ""{regex}"", RegexOptions.None, TimeSpan.FromSeconds(3)))";
+                }
+                else
+                {
+                    result = ValueOrNull<string>.CreateNull("No proper regex!");
+                }
+            }
+            else
+            {
+                result = ValueOrNull<string>.CreateNull("No arguments!");
+            }
+            return result;
+        }
+
+        private static string GetRegex(Microsoft.CodeAnalysis.SeparatedSyntaxList<AttributeArgumentSyntax> arguments)
+        {
+            string regex = null;
+
+            var firstArg = arguments.FirstOrDefault();
+            if (firstArg.Expression is LiteralExpressionSyntax literalArg)
+            {
+                regex = literalArg.Token.Value?.ToString();
+            }
+
+            return regex;
         }
     }
 }
