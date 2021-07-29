@@ -1,35 +1,38 @@
-﻿using MediatR.ValidationGenerator.Gen.RuleGenerators;
-using Microsoft.CodeAnalysis;
+﻿using MediatR.ValidationGenerator.Gen.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen
 {
     public static class AttributeService
     {
+        private static List<string> _supportedAttributes = new List<string>
+        {
+            "Required"
+        };
+
         public static bool AttributeIsSupported(AttributeSyntax attribute)
         {
-            var generators = RuleGeneratorsCollector.Collect();
-            return generators.Any(x => x.IsMatchingAttribute(attribute));
+            return _supportedAttributes.Contains(attribute.Name.ToString());
         }
 
-        public static IEnumerable<string> CreateRulesForAttribute(AttributeSyntax attribute)
+        public static ValueOrNull<string> CreateRuleForAttribute(AttributeSyntax attribute)
         {
-            List<string> rules = new List<string>();
-            var generators = RuleGeneratorsCollector.Collect();
-            foreach (var generator in generators)
+            string attributeName = attribute.Name.ToString();
+
+            ValueOrNull<string> result;
+            switch (attributeName)
             {
-                if (generator.IsMatchingAttribute(attribute))
-                {
-                    var rule = generator.GenerateRuleFor(attribute);
-                    if (rule.HasValue)
-                    {
-                        rules.Add(rule.Value);
-                    }
-                }
+                case "Required":
+                    result = ".NotEmpty()";
+                    break;
+                default:
+                    result = ValueOrNull<string>.CreateNull("Unsupported attribute");
+                    break;
             }
-            return rules;
+            return result;
         }
     }
 }

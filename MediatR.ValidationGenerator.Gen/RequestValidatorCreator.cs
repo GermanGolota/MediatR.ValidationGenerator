@@ -1,10 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,34 +18,53 @@ namespace MediatR.ValidationGenerator.Gen
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("FluentValidation")
                      .Implementing($"AbstractValidator<{requestClassName}>")
-                     .WithConstructor(ctor =>
+                     .WithMethod((initialMargin) =>
                      {
-                         return ctor.WithBody((body) =>
-                         {
-                             foreach (var entry in model.PropertyToSupportedAttributes)
+                         return new MethodBuilder(initialMargin)
+                             .AsOverride()
+                             //.AsAsync()
+                             .WithReturnType("Task<ValidationResult>")
+                             .WithName("ValidateAsync")
+                             .WithParameter("ValidationContext<string>", "context")
+                             .WithParameter("CancellationToken", "cancellation", "default")
+                             .WithBody((methodBuilder) =>
                              {
-                                 var prop = entry.Key;
-                                 var attributes = entry.Value;
-                                 body.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
-
-                                 List<string> rules = attributes
-                                                .Select(attribute => AttributeService.CreateRulesForAttribute(attribute))
-                                                .Flatten()
-                                                .ToList();
-
-                                 for (int i = 0; i < rules.Count; i++)
+                                 foreach (var entry in model.PropertyToSupportedAttributes)
                                  {
-                                     bool isLastRule = i == rules.Count - 1;
-                                     var rule = rules[i];
-                                     body.AppendLine(rule, 1, isLastRule);
-                                 }
-                             }
+                                     var prop = entry.Key;
+                                     var attributes = entry.Value;
+                                     methodBuilder.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
 
-                             return body;
-                         });
+                                     foreach (var attribute in attributes)
+                                     {
+                                         var attributeRule = AttributeService.CreateRuleForAttribute(attribute);
+                                         if (attributeRule.HasValue)
+                                         {
+                                             methodBuilder.AppendLine(attributeRule.Value, 1);
+                                         }
+                                     }
+                                 }
+
+                                 methodBuilder.AppendLine("return base.ValidateAsync(context, cancellation)");
+
+                                 return methodBuilder;
+                             });
                      });
 
             return classBuilder.Build();
+        }
+    }
+
+
+    public class Validator : AbstractValidator<string>
+    {
+        public override Task<ValidationResult> ValidateAsync(
+            ValidationContext<string> context,
+            CancellationToken cancellation = default)
+        {
+            RuleFor(x => x.Length)
+                .NotEmpty();
+            return base.ValidateAsync(context, cancellation);
         }
     }
 }
