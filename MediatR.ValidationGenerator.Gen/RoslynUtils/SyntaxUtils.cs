@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using MediatR.ValidationGenerator.Gen.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,21 @@ namespace MediatR.ValidationGenerator.Gen.RoslynUtils
         public static bool IsTheSameClassNameOrGeneric(string className, string baseClassName)
         {
             return baseClassName.Equals(className) || baseClassName.StartsWith($"{className}<");
+        }
+
+        public static ValueOrNull<string> GetNamespace(ClassDeclarationSyntax classSyntax)
+        {
+            ValueOrNull<string> result;
+            if (classSyntax.Parent is NamespaceDeclarationSyntax nameSpace)
+            {
+                result = nameSpace.Name.ToString();
+            }
+            else
+            {
+                result = ValueOrNull<string>.CreateNull("Not in a namespace");
+            }
+
+            return result;
         }
     }
 }

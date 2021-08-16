@@ -1,12 +1,9 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using MediatR.ValidationGenerator.Gen.Builders;
+﻿using MediatR.ValidationGenerator.Gen.Builders;
 using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
+using MediatR.ValidationGenerator.Gen.RoslynUtils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MediatR.ValidationGenerator.Gen
 {
@@ -16,11 +13,14 @@ namespace MediatR.ValidationGenerator.Gen
         public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
         {
             string requestClassName = model.RequestClass.Identifier.ToString();
+            string requestNamespace = GetRequestNamespace(model);
+
             var classBuilder = new ClassBuilder()
                      .WithClassName(model.ValidatorName)
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("FluentValidation")
                      .UsingNamespace("System")
+                     .UsingNamespace(requestNamespace)
                      .Implementing($"AbstractValidator<{requestClassName}>")
                      .WithConstructor(ctor =>
                      {
@@ -50,6 +50,22 @@ namespace MediatR.ValidationGenerator.Gen
                      });
 
             return classBuilder.Build();
+        }
+
+        private static string GetRequestNamespace(RequestValidationModel model)
+        {
+            var namespaceResult = SyntaxUtils.GetNamespace(model.RequestClass);
+            string requestNamespace;
+            if (namespaceResult.IsNull)
+            {
+                requestNamespace = "System.Linq"; //TODO: Output error message
+            }
+            else
+            {
+                requestNamespace = namespaceResult.Value;
+            }
+
+            return requestNamespace;
         }
     }
 }
