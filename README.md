@@ -15,6 +15,21 @@ Add validators to DI container with AddGeneratedValidators </br> </br>
       services.AddGeneratedValidators();
   }
 ```
+Add attributes from list of <a href="2">supported attributes </a> to request models
+```csharp
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace MediatR.ValidationGenerator.Sample
+{
+    public class ValueCommand : IRequest<string>
+    {
+        [Required]
+        [RegularExpression("[A-Z,a-z,0-9,-]")]
+        public Guid ValueId { get; set; }
+    }
+}
+```
 
 <h1 id="2">Supported attributes</h1>
 <h2>System.ComponentModel:</h2>
