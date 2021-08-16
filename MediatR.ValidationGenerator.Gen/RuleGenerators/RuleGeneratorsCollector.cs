@@ -13,7 +13,8 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
         {
             _generators = new List<IRuleGenerator>()
             {
-                new RequiredRuleGenerator()
+                new RequiredRuleGenerator(),
+                new RegexRuleGenerator()
             };
         }
 

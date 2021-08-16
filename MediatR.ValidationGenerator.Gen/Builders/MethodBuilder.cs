@@ -7,7 +7,6 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
-
     public class MethodBuilder : ValidatingBuilder
     {
         private int _leftMargin;
@@ -62,8 +61,8 @@ namespace MediatR.ValidationGenerator.Gen.Builders
 
         public MethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
         {
-            var initialBody = new MethodBodyBuilder(_leftMargin);
-            var body = builder(initialBody);
+            var body = new MethodBodyBuilder(_leftMargin);
+            body = builder(body);
             _body = body;
             return this;
         }
@@ -148,11 +147,26 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             signatureBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{_returnType} {_methodName}");
             signatureBuilder.Append("(");
-            string parameterStr = BuilderUtils.BuildParameterList(_parameters);
+            string parameterStr = BuildParameters();
             signatureBuilder.Append(parameterStr);
             signatureBuilder.Append(")");
             string signature = signatureBuilder.ToString();
             return signature;
+        }
+
+        private string BuildParameters()
+        {
+            List<string> parameters = new List<string>();
+            foreach (var parameter in _parameters)
+            {
+                string parameterStr = $"{parameter.Type} {parameter.Name}";
+                if (parameter.DefaultValue.IsNotEmpty())
+                {
+                    parameterStr += $" = {parameter.DefaultValue}";
+                }
+                parameters.Add(parameterStr);
+            }
+            return String.Join(", ", parameters);
         }
     }
 }

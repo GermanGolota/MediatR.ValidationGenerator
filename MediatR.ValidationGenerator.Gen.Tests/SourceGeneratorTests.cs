@@ -39,7 +39,8 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
 {
     public class ValueCommand : BaseRequest<string>
     {
-        [Required(ErrorMessage = ""Value id cannot be empty"")]
+        [Required]
+        [RegularExpression(""[A-Z,a-z,0-9,-]"")]
         public Guid ValueId { get; set; }
     }
 }
