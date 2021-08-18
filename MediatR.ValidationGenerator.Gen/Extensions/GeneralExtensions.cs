@@ -11,6 +11,7 @@ namespace MediatR.ValidationGenerator.Gen.Extensions
         {
             return String.IsNullOrEmpty(str);
         }
+
         public static bool IsNotEmpty(this string str)
         {
             return !str.IsEmpty();
@@ -29,11 +30,16 @@ namespace MediatR.ValidationGenerator.Gen.Extensions
         public static TProperty With<T, TProperty>(this T self, Func<T, TProperty> propertyFunction,
             TProperty defaultValue = default) where T : class
         {
+            TProperty result;
             if (self == default(T))
             {
-                return defaultValue;
+                result = defaultValue;
             }
-            return propertyFunction(self);
+            else
+            {
+                result = propertyFunction(self);
+            }
+            return result;
         }
 
         public static bool NotEndsWith(this string str, string endStr)

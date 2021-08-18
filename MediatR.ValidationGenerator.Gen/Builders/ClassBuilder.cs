@@ -4,12 +4,24 @@ using MediatR.ValidationGenerator.Gen.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
 {
     public class ClassBuilder : ValidatingBuilder
     {
+        protected override IEnumerable<ValidatingBuilder> InnerBuilders
+        {
+            get
+            {
+                List<ValidatingBuilder> builders = new List<ValidatingBuilder>();
+                builders.AddRange(_methods);
+                builders.Add(_constructor);
+                return builders;
+            }
+        }
+
         private List<string> _implementsList = new List<string>();
         private List<string> _usedNamespaces = new List<string>();
 
