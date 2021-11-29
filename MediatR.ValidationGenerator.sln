@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator.Gen", "MediatR.ValidationGenerator.Gen\MediatR.ValidationGenerator.Gen.csproj", "{16E5F79F-D369-4F2E-B7BE-17C26D5545E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator", "MediatR.ValidationGenerator\MediatR.ValidationGenerator.csproj", "{16E5F79F-D369-4F2E-B7BE-17C26D5545E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator.Gen.Tests", "MediatR.ValidationGenerator.Gen.Tests\MediatR.ValidationGenerator.Gen.Tests.csproj", "{669B7486-3413-4C6D-B3C8-DFA26057C221}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator.Tests", "MediatR.ValidationGenerator.Tests\MediatR.ValidationGenerator.Tests.csproj", "{669B7486-3413-4C6D-B3C8-DFA26057C221}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
