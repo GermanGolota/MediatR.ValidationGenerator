@@ -9,44 +9,55 @@ namespace MediatR.ValidationGenerator.Gen
 {
     public static class RequestValidatorCreator
     {
-        public const string VALIDATORS_NAMESPACE = "Validators.Generated";
+        public static readonly string VALIDATE_METHOD_NAME = "Validate";
+        public static readonly string VALIDATOR_PARAMETER_NAME = "value";
+        public static readonly string VALIDATOR_ERRORS_LIST_NAME = "failures";
+        public static readonly string VALIDATOR_VALIDITY_NAME = "isValid";
+
+        public static readonly string VALIDATORS_NAMESPACE = "Validators.Generated";
         public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
         {
             string requestClassName = model.RequestClass.Identifier.ToString();
             string requestNamespace = GetRequestNamespace(model);
 
             var classBuilder = new ClassBuilder()
-                     .WithClassName(model.ValidatorName)
+                     .WithClassName($"{model.ValidatorName}<{requestClassName}>")
                      .WithNamespace(VALIDATORS_NAMESPACE)
-                     .UsingNamespace("FluentValidation")
                      .UsingNamespace("System")
                      .UsingNamespace(requestNamespace)
                      .Implementing($"AbstractValidator<{requestClassName}>")
-                     .WithConstructor(ctor =>
+                     .WithMethod(method =>
                      {
-                         return ctor.WithBody((body) =>
-                         {
-                             foreach (var entry in model.PropertyToSupportedAttributes)
-                             {
-                                 var prop = entry.Key;
-                                 var attributes = entry.Value;
-                                 body.AppendLine($"RuleFor(x => x.{prop.Identifier})", endLine: false);
+                         return method.WithName(VALIDATE_METHOD_NAME)
+                                .WithReturnType("ValidationResult")
+                                .WithParameter("T", VALIDATOR_PARAMETER_NAME)
+                                .WithBody(body =>
+                                {
+                                    body
+                                       .AppendLine($"bool {VALIDATOR_VALIDITY_NAME} = true")
+                                       .AppendLine($"List<ValidationFailure> {VALIDATOR_ERRORS_LIST_NAME} = new List<ValidationFailure>()");
 
-                                 List<string> rules = attributes
-                                                .Select(attribute => AttributeService.CreateRulesForAttribute(attribute))
-                                                .Flatten()
-                                                .ToList();
+                                    foreach (var entry in model.PropertyToSupportedAttributes)
+                                    {
+                                        var prop = entry.Key;
+                                        var attributes = entry.Value;
 
-                                 for (int i = 0; i < rules.Count; i++)
-                                 {
-                                     bool isLastRule = i == rules.Count - 1;
-                                     var rule = rules[i];
-                                     body.AppendLine(rule, 1, isLastRule);
-                                 }
-                             }
+                                        body.AppendLine($"#region {prop.Identifier}Validation");
+                                        List<string> rules = AttributeService.CreateRulesForAttributes(prop, attributes);
 
-                             return body;
-                         });
+                                        for (int i = 0; i < rules.Count; i++)
+                                        {
+                                            var rule = rules[i];
+                                            body.AppendLine(rule, 1, true);
+                                        }
+                                        body.AppendLine($"#endregion");
+                                    }
+
+                                    body.AppendLine($"return new ValidationResult()");
+
+                                    return body;
+
+                                });
                      });
 
             return classBuilder.Build();

@@ -1,5 +1,7 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Gen.Builders;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -17,30 +19,7 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
             return attributeName == _requiredAttributeName;
         }
 
-        public ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute)
-        {
-            var arguments = attribute.With(x => x.ArgumentList).With(x => x.Arguments);
-            ValueOrNull<string> result;
-            if (arguments.IsNotNull())
-            {
-                string regex = GetRegex(arguments);
-                if (regex.IsNotEmpty())
-                {
-                    result = @$".Must(value => Regex.IsMatch(value.ToString(), ""{regex}"", RegexOptions.None, TimeSpan.FromSeconds(3)))";
-                }
-                else
-                {
-                    result = ValueOrNull<string>.CreateNull("No proper regex!");
-                }
-            }
-            else
-            {
-                result = ValueOrNull<string>.CreateNull("No arguments!");
-            }
-            return result;
-        }
-
-        private static string GetRegex(Microsoft.CodeAnalysis.SeparatedSyntaxList<AttributeArgumentSyntax> arguments)
+        private static string GetRegex(SeparatedSyntaxList<AttributeArgumentSyntax> arguments)
         {
             string regex = null;
 
@@ -51,6 +30,39 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
             }
 
             return regex;
+        }
+
+        public ValueOrNull<List<string>> GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute)
+        {
+            var arguments = attribute.With(x => x.ArgumentList).With(x => x.Arguments);
+            ValueOrNull<List<string>> result;
+            if (arguments.IsNotNull())
+            {
+                string regex = GetRegex(arguments);
+                if (regex.IsNotEmpty())
+                {
+                    List<string> lines = new List<string>();
+                    string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
+                    string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
+                    string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
+                    string fullProp = $"{ param }.{ prop.Identifier}";
+                    lines.Add($"if(Regex.IsMatch({fullProp}, \"{regex}\", RegexOptions.None, TimeSpan.FromSeconds(3)) == false)");
+                    lines.Add("{");
+                    lines.Add(BuilderUtils.TAB + $"{errors}.Add(new ValidationFailure(\"nameof({fullProp})\", \"Does not fulfill regex\"))");
+                    lines.Add(BuilderUtils.TAB + $"{validityFlag} = false");
+                    lines.Add("}");
+                    result = lines;
+                }
+                else
+                {
+                    result = ValueOrNull<List<string>>.CreateNull("No proper regex!");
+                }
+            }
+            else
+            {
+                result = ValueOrNull<List<string>>.CreateNull("No arguments!");
+            }
+            return result;
         }
     }
 }

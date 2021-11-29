@@ -4,7 +4,6 @@ using MediatR.ValidationGenerator.Gen.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Text;
 
 namespace MediatR.ValidationGenerator.Gen.Builders
@@ -16,8 +15,14 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             get
             {
                 List<ValidatingBuilder> builders = new List<ValidatingBuilder>();
-                builders.AddRange(_methods);
-                builders.Add(_constructor);
+                if (_methods.IsNotNull())
+                {
+                    builders.AddRange(_methods);
+                }
+                if (_constructor.IsNotNull())
+                {
+                    builders.Add(_constructor);
+                }
                 return builders;
             }
         }

@@ -72,7 +72,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             //Act
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-            GeneratorDriverRunResult _ = driver.GetRunResult();
+            GeneratorDriverRunResult result = driver.GetRunResult();
             //Assert
             //do not throws
         }
