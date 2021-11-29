@@ -9,6 +9,6 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
     public interface IRuleGenerator
     {
         bool IsMatchingAttribute(AttributeSyntax attribute);
-        ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute);
+        ValueOrNull<List<string>> GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute);
     }
 }

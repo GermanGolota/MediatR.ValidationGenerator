@@ -1,6 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Gen.Builders;
+using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -15,18 +17,43 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
             return attributeName == _requiredAttributeName;
         }
 
-        public ValueOrNull<string> GenerateRuleFor(AttributeSyntax attribute)
+        public ValueOrNull<List<string>> GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute)
         {
-            string result = ".NotEmpty()";
-            string customeErrorMessage = GetCustomeErrorMessageOrNull(attribute);
-            if (customeErrorMessage.IsNotEmpty())
+            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
+            string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
+            string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
+
+            string fullProp = $"{ param }.{ prop.Identifier}";
+            string errorMessage = GetCustomErrorMessageOrNull(attribute);
+            if (errorMessage.IsEmpty())
             {
-                result += $".WithMessage(\"{customeErrorMessage}\")";
+                errorMessage = "Empty required valued";
             }
-            return result;
+
+            List<string> lines = new List<string>();
+            lines.Add($"switch({fullProp})");
+            lines.Add("{");
+            List<string> cases = new List<string>()
+            {
+                "null",
+                "string s when String.IsNullOrWhiteSpace(s)",
+                "ICollection {Count: 0}",
+                "Array {Length: 0}",
+                "IEnumerable e when !e.GetEnumerator().MoveNext():"
+            };
+
+            foreach (var matchCase in cases)
+            {
+                lines.Add($"{BuilderUtils.TAB}case {matchCase}:");
+            }
+            lines.Add($"{BuilderUtils.TAB}{BuilderUtils.TAB} {errors}.Add(new ValidationFailure(\"nameof({fullProp})\", \"{errorMessage}\"))");
+            lines.Add($"{BuilderUtils.TAB}{BuilderUtils.TAB} {validityFlag} = false\")");
+            lines.Add("}");
+
+            return lines;
         }
 
-        private static string GetCustomeErrorMessageOrNull(AttributeSyntax attribute)
+        private static string GetCustomErrorMessageOrNull(AttributeSyntax attribute)
         {
             string customeErrorMessage = null;
             var arguments = attribute.ArgumentList?.Arguments;
@@ -47,5 +74,6 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
 
             return customeErrorMessage;
         }
+
     }
 }

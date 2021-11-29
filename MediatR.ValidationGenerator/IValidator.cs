@@ -7,11 +7,16 @@ namespace MediatR.ValidationGenerator
 {
     public interface IValidator<in T>
     {
-        ValidationResult Validate(T data);
+        ValidationResult Validate(T value);
     }
 
     public class ValidationResult
     {
+        public ValidationResult(bool isValid, List<ValidationFailure> errors)
+        {
+            IsValid = isValid;
+            Errors = errors;
+        }
         //
         // Summary:
         //     Whether validation succeeded
@@ -24,6 +29,11 @@ namespace MediatR.ValidationGenerator
 
     public class ValidationFailure
     {
+        public ValidationFailure(string propertyName, string errorMessage)
+        {
+            PropertyName = propertyName;
+            ErrorMessage = errorMessage;
+        }
         //
         // Summary:
         //     The name of the property.

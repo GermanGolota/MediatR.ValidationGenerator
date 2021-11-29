@@ -14,18 +14,24 @@ namespace MediatR.ValidationGenerator.Gen
             return generators.Any(x => x.IsMatchingAttribute(attribute));
         }
 
-        public static IEnumerable<string> CreateRulesForAttribute(AttributeSyntax attribute)
+        public static List<string> CreateRulesForAttributes(
+            PropertyDeclarationSyntax prop,
+            IEnumerable<AttributeSyntax> attributes
+            )
         {
             List<string> rules = new List<string>();
             var generators = RuleGeneratorsCollector.Collect();
-            foreach (var generator in generators)
+            foreach (var attribute in attributes)
             {
-                if (generator.IsMatchingAttribute(attribute))
+                foreach (var generator in generators)
                 {
-                    var rule = generator.GenerateRuleFor(attribute);
-                    if (rule.HasValue)
+                    if (generator.IsMatchingAttribute(attribute))
                     {
-                        rules.Add(rule.Value);
+                        var rule = generator.GenerateRuleFor(prop, attribute);
+                        if (rule.HasValue)
+                        {
+                            rules.AddRange(rule.Value);
+                        }
                     }
                 }
             }
