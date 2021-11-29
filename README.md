@@ -12,21 +12,23 @@ Add validators to DI container with AddGeneratedValidators </br> </br>
 ```csharp
   public void ConfigureServices(IServiceCollection services)
   {
-      services.AddGeneratedValidators();
+    var assemblies = new[] { typeof(Startup).Assembly };
+    services.AddMediatR(assemblies);
+    services.AddGeneratedValidators(assemblies);
   }
 ```
 Add attributes from list of <a href="#2">supported attributes </a> to request models
 ```csharp
-using System;
+using MediatR;
 using System.ComponentModel.DataAnnotations;
 
-namespace MediatR.ValidationGenerator.Sample
+namespace ExampleApp.Requests
 {
-    public class ValueCommand : IRequest<string>
+    public class DuplicateRequest : IRequest<string>
     {
         [Required]
         [RegularExpression("[A-Z,a-z,0-9,-]")]
-        public Guid ValueId { get; set; }
+        public string Text { get; set; }
     }
 }
 ```
