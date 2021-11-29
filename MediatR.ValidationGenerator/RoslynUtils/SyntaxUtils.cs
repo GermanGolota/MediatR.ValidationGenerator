@@ -1,11 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Models;
+﻿using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.RoslynUtils
+namespace MediatR.ValidationGenerator.RoslynUtils
 {
     internal static class SyntaxUtils
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MediatR.ValidationGenerator.Gen.RuleGenerators
+﻿namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public static class AttributeHelper
     {

@@ -1,4 +1,4 @@
-﻿namespace MediatR.ValidationGenerator.Gen.Models
+﻿namespace MediatR.ValidationGenerator.Models
 {
     public struct ValueOrNull<T>
     {

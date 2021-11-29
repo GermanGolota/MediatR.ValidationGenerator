@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace MediatR.ValidationGenerator.Gen.RuleGenerators
+namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public static class RuleGeneratorsCollector
     {

@@ -1,4 +1,4 @@
-﻿namespace MediatR.ValidationGenerator.Gen.Builders
+﻿namespace MediatR.ValidationGenerator.Builders
 {
     public enum AccessModifier
     {

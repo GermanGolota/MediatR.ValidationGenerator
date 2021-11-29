@@ -1,9 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Extensions
+namespace MediatR.ValidationGenerator.Extensions
 {
     internal static class RoslynExtensions
     {

@@ -1,12 +1,12 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Models;
-using MediatR.ValidationGenerator.Gen.RuleGenerators;
+﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Models;
+using MediatR.ValidationGenerator.RuleGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MediatR.ValidationGenerator.Gen
+namespace MediatR.ValidationGenerator
 {
     public static class AttributeService
     {

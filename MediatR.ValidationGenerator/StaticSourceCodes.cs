@@ -1,4 +1,4 @@
-﻿namespace MediatR.ValidationGenerator.Gen
+﻿namespace MediatR.ValidationGenerator
 {
     public static class StaticSourceCodes
     {

@@ -1,11 +1,11 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
-using MediatR.ValidationGenerator.Gen.Extensions;
-using MediatR.ValidationGenerator.Gen.Models;
+﻿using MediatR.ValidationGenerator.Builders.Abstractions;
+using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Builders
+namespace MediatR.ValidationGenerator.Builders
 {
     public class ClassConstructorBuilder : ValidatingBuilder
     {
@@ -16,7 +16,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         private AccessModifier _modifier = AccessModifier.Public;
         private List<MethodParameter> _parameters = new List<MethodParameter>();
 
-        private MethodBodyBuilder _body; 
+        private MethodBodyBuilder _body;
 
         private MethodBodyBuilder GetBody()
         {

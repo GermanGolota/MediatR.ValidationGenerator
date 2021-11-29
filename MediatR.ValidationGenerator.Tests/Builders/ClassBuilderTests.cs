@@ -1,12 +1,7 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR.ValidationGenerator.Builders;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Gen.Tests.Builders
+namespace MediatR.ValidationGenerator.Tests.Builders
 {
     public class ClassBuilderTests
     {
@@ -19,7 +14,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.Builders
                 .WithNamespace("TestNamespace")
                 .WithAccessModifier(AccessModifier.Public)
                 .WithClassName("Test")
-                .WithMethod((builder)=>
+                .WithMethod((builder) =>
                 {
                     return builder
                         .WithModifier(AccessModifier.Public)
@@ -36,7 +31,6 @@ namespace TestNamespace
         public void DoNothing()
         {
         }
-
     }
 }
 ".RemoveFirstNewLine();

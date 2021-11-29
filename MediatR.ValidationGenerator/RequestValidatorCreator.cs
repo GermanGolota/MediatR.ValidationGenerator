@@ -1,8 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Models;
-using MediatR.ValidationGenerator.Gen.RoslynUtils;
+﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Models;
+using MediatR.ValidationGenerator.RoslynUtils;
 
-namespace MediatR.ValidationGenerator.Gen
+namespace MediatR.ValidationGenerator
 {
     public static class RequestValidatorCreator
     {

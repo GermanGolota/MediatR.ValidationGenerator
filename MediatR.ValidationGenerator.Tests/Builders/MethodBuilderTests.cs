@@ -1,13 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Models;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Gen.Tests.Builders
+namespace MediatR.ValidationGenerator.Tests.Builders
 {
     public class MethodBuilderTests
     {

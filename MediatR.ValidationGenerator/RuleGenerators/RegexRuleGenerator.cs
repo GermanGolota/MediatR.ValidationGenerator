@@ -1,11 +1,11 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Extensions;
-using MediatR.ValidationGenerator.Gen.Models;
+﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
 
-namespace MediatR.ValidationGenerator.Gen.RuleGenerators
+namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public class RegexRuleGenerator : IRuleGenerator
     {

@@ -1,11 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.RoslynUtils
+namespace MediatR.ValidationGenerator.RoslynUtils
 {
     internal class TypeSyntaxReceiver : ISyntaxReceiver
     {

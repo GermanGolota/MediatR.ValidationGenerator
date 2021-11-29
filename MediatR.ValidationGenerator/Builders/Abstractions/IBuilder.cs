@@ -1,9 +1,6 @@
-﻿using MediatR.ValidationGenerator.Gen.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR.ValidationGenerator.Models;
 
-namespace MediatR.ValidationGenerator.Gen.Builders.Abstractions
+namespace MediatR.ValidationGenerator.Builders.Abstractions
 {
     public interface IBuilder
     {

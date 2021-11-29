@@ -1,9 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Builders
+namespace MediatR.ValidationGenerator.Builders
 {
     public static class BuilderUtils
     {
@@ -21,7 +20,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 }
                 parameterStrs.Add(parameterStr);
             }
-            return String.Join(", ", parameterStrs);
+            return string.Join(", ", parameterStrs);
         }
     }
 }

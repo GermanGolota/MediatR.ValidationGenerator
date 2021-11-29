@@ -1,10 +1,8 @@
-﻿using MediatR.ValidationGenerator.Gen.Extensions;
-using MediatR.ValidationGenerator.Gen.Models;
-using System;
+﻿using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using System.Collections.Generic;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Builders.Abstractions
+namespace MediatR.ValidationGenerator.Builders.Abstractions
 {
     public abstract class ValidatingBuilder : IBuilder
     {

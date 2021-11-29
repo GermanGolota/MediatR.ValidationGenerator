@@ -1,11 +1,11 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
-using MediatR.ValidationGenerator.Gen.Extensions;
-using MediatR.ValidationGenerator.Gen.Models;
+﻿using MediatR.ValidationGenerator.Builders.Abstractions;
+using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Builders
+namespace MediatR.ValidationGenerator.Builders
 {
     public class MethodBuilder : ValidatingBuilder
     {
@@ -166,7 +166,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
                 }
                 parameters.Add(parameterStr);
             }
-            return String.Join(", ", parameters);
+            return string.Join(", ", parameters);
         }
     }
 }
