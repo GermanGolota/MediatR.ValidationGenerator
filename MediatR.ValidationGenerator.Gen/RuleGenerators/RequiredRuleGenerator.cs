@@ -17,42 +17,6 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
             return attributeName == _requiredAttributeName;
         }
 
-        public ValueOrNull<List<string>> GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute)
-        {
-            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
-            string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
-            string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
-
-            string fullProp = $"{ param }.{ prop.Identifier}";
-            string errorMessage = GetCustomErrorMessageOrNull(attribute);
-            if (errorMessage.IsEmpty())
-            {
-                errorMessage = "Empty required valued";
-            }
-
-            List<string> lines = new List<string>();
-            lines.Add($"switch({fullProp})");
-            lines.Add("{");
-            List<string> cases = new List<string>()
-            {
-                "null",
-                "string s when String.IsNullOrWhiteSpace(s)",
-                "ICollection {Count: 0}",
-                "Array {Length: 0}",
-                "IEnumerable e when !e.GetEnumerator().MoveNext():"
-            };
-
-            foreach (var matchCase in cases)
-            {
-                lines.Add($"{BuilderUtils.TAB}case {matchCase}:");
-            }
-            lines.Add($"{BuilderUtils.TAB}{BuilderUtils.TAB} {errors}.Add(new ValidationFailure(\"nameof({fullProp})\", \"{errorMessage}\"))");
-            lines.Add($"{BuilderUtils.TAB}{BuilderUtils.TAB} {validityFlag} = false\")");
-            lines.Add("}");
-
-            return lines;
-        }
-
         private static string GetCustomErrorMessageOrNull(AttributeSyntax attribute)
         {
             string customeErrorMessage = null;
@@ -75,5 +39,39 @@ namespace MediatR.ValidationGenerator.Gen.RuleGenerators
             return customeErrorMessage;
         }
 
+        public SuccessOrFailure GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute, MethodBodyBuilder body)
+        {
+            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
+            string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
+            string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
+
+            string fullProp = $"{ param }.{ prop.Identifier}";
+            string errorMessage = GetCustomErrorMessageOrNull(attribute);
+            if (errorMessage.IsEmpty())
+            {
+                errorMessage = "Empty required valued";
+            }
+
+            body.AppendLine($"switch({fullProp})", endLine: false);
+            body.AppendLine("{", endLine: false);
+            List<string> cases = new List<string>()
+            {
+                "null",
+                "string s when String.IsNullOrWhiteSpace(s)",
+                "ICollection {Count: 0}",
+                "Array {Length: 0}",
+                "IEnumerable e when !e.GetEnumerator().MoveNext()"
+            };
+
+            foreach (var matchCase in cases)
+            {
+                body.AppendLine($"case {matchCase}:", 1, endLine: false);
+            }
+            body.AppendLine($"{errors}.Add(new ValidationFailure(nameof({fullProp}), \"{errorMessage}\"))", 2);
+            body.AppendLine($"{validityFlag} = false", 2);
+            body.AppendLine("}", endLine: false);
+
+            return true;
+        }
     }
 }
