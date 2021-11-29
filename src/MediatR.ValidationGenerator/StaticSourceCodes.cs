@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace MediatR.ValidationGenerator
+namespace MediatR.ValidationGenerator.Internal
 {
     public interface IValidator<in T>
     {
@@ -93,7 +93,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.ValidationGenerator
+namespace MediatR.ValidationGenerator.Internal
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
          where TRequest : IRequest<TResponse>
@@ -139,6 +139,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using MediatR.ValidationGenerator.Internal;
 
 namespace MediatR.ValidationGenerator
 {
@@ -244,7 +245,7 @@ namespace MediatR.ValidationGenerator
                         var matchingInterface = genericInterfaces.FirstOrDefault();
                         return new { type, matchingInterface };
                     })
-                    .Where(pair => pair is null == false)
+                    .Where(pair => pair.matchingInterface is null == false)
                     .Select(x => new AssemblyScanResult(x.matchingInterface, x.type));
 
                 return query;

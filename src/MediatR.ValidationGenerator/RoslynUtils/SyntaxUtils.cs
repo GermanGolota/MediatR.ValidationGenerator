@@ -8,11 +8,21 @@ namespace MediatR.ValidationGenerator.RoslynUtils
     {
         public static bool InheritsFrom(TypeDeclarationSyntax declaration, string className)
         {
-            return declaration.BaseList.Types.Any(x =>
+            var types = declaration?.BaseList?.Types;
+            bool result;
+            if (types.HasValue)
             {
-                string baseClassName = x.ToString();
-                return IsTheSameClassNameOrGeneric(className, baseClassName);
-            });
+                result = types.Value.Any(x =>
+                {
+                    string baseClassName = x.ToString();
+                    return IsTheSameClassNameOrGeneric(className, baseClassName);
+                });
+            }
+            else
+            {
+                result = false;
+            }
+            return result;
         }
 
         //TODO: Fix this returning wrong result when having a generic and non generic types

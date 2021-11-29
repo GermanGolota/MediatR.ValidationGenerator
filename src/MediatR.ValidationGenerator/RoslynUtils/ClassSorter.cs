@@ -58,16 +58,20 @@ namespace MediatR.ValidationGenerator.RoslynUtils
         {
             var alreadyInherits = known[true];
             bool result = false;
-            foreach (var baseType in declaration.BaseList.Types)
+            var types = declaration?.BaseList?.Types;
+            if (types.HasValue)
             {
-                string baseTypeName = baseType.ToString();
-                foreach (var inheritedClass in alreadyInherits)
+                foreach (var baseType in types.Value)
                 {
-                    string inheritedClassName = inheritedClass.Identifier.ToString();
-                    if (SyntaxUtils.IsTheSameClassNameOrGeneric(inheritedClassName, baseTypeName))
+                    string baseTypeName = baseType.ToString();
+                    foreach (var inheritedClass in alreadyInherits)
                     {
-                        result = true;
-                        break;
+                        string inheritedClassName = inheritedClass.Identifier.ToString();
+                        if (SyntaxUtils.IsTheSameClassNameOrGeneric(inheritedClassName, baseTypeName))
+                        {
+                            result = true;
+                            break;
+                        }
                     }
                 }
             }
