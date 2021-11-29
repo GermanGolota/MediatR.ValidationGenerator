@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,13 +22,17 @@ namespace MediatR.ValidationGenerator
             RequestHandlerDelegate<TResponse> next
         )
         {
-            var failures = _validators
-                .Select(validator => validator.Validate(request))
-                .SelectMany(result => result.Errors)
-                .Where(failure => !(failure is null))
-                .ToList();
+            List<ValidationFailure> failures = new List<ValidationFailure>();
+            foreach (var validator in _validators)
+            {
+                var result = validator.Validate(request);
+                if (result.Errors is null == false)
+                {
+                    failures.AddRange(result.Errors);
+                }
+            }
 
-            if (failures.Any())
+            if (failures.Count > 0)
             {
                 throw new ValidationException(failures);
             }
