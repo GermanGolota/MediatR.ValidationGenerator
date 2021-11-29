@@ -16,6 +16,12 @@ namespace MediatR.ValidationGenerator.Gen
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => new TypeSyntaxReceiver());
+            context.RegisterForPostInitialization(context =>
+            {
+                context.AddSource("Validator.cs", StaticSourceCodes.Validator);
+                context.AddSource("ValidationBehavior.cs", StaticSourceCodes.Behavior);
+                context.AddSource("DIExtensions.cs", StaticSourceCodes.DIExtensions);
+            });
         }
 
         public void Execute(GeneratorExecutionContext context)
