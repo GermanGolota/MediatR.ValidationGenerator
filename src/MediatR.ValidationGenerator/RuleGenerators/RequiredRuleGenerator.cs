@@ -52,7 +52,8 @@ namespace MediatR.ValidationGenerator.RuleGenerators
                 errorMessage = "Empty required valued";
             }
 
-            body.AppendLine($"switch({fullProp})", endLine: false);
+            //TODO: Generate validation based on prop type
+            body.AppendLine($"switch((object){fullProp})", endLine: false);
             body.AppendLine("{", endLine: false);
             List<string> cases = new List<string>()
             {
@@ -69,6 +70,7 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             }
             body.AppendLine($"{errors}.Add(new ValidationFailure(nameof({fullProp}), \"{errorMessage}\"))", 2);
             body.AppendLine($"{validityFlag} = false", 2);
+            body.AppendLine("break", 2);
             body.AppendLine("}", endLine: false);
 
             return true;

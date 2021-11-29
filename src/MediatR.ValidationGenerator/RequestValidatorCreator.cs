@@ -18,16 +18,19 @@ namespace MediatR.ValidationGenerator
             string requestNamespace = GetRequestNamespace(model);
 
             var classBuilder = new ClassBuilder()
-                     .WithClassName($"{model.ValidatorName}<{requestClassName}>")
+                     .WithClassName($"{model.ValidatorName}")
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .UsingNamespace("System")
+                     .UsingNamespace("System.Collections")
+                     .UsingNamespace("System.Collections.Generic")
                      .UsingNamespace(requestNamespace)
-                     .Implementing($"AbstractValidator<{requestClassName}>")
+                     .UsingNamespace("MediatR.ValidationGenerator.Internal")
+                     .Implementing($"IValidator<{requestClassName}>")
                      .WithMethod(method =>
                      {
                          return method.WithName(VALIDATE_METHOD_NAME)
                                 .WithReturnType("ValidationResult")
-                                .WithParameter("T", VALIDATOR_PARAMETER_NAME)
+                                .WithParameter(requestClassName, VALIDATOR_PARAMETER_NAME)
                                 .WithBody(body =>
                                 {
                                     body
