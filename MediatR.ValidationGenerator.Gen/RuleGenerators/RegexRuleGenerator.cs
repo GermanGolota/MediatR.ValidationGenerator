@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using MediatR.ValidationGenerator.Gen.Extensions;
+﻿using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
