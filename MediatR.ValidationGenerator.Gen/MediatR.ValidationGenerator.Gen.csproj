@@ -7,12 +7,37 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" PrivateAssets="all" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"  IncludeInPackage="true"/>
+    <PackageReference Include="MediatR" Version="9.0.0" IncludeInPackage="true" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" IncludeInPackage="true"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
-  
+
+  <Target Name="AddNuGetDlls" BeforeTargets="_GetPackageFiles">
+    <!-- Merge the collection of PackageReference and Assemblies using the NuGetPackageId key.
+           This produces a new list containing the DLL path and the "IncludeInPackage" metadata-->
+    <JoinItems Left="@(ResolvedCompileFileDefinitions)" LeftKey="NuGetPackageId" LeftMetadata="*" Right="@(PackageReference)" RightKey="" RightMetadata="*" ItemSpecToUse="Left">
+      <Output TaskParameter="JoinResult" ItemName="_PackagesToPack" />
+    </JoinItems>
+
+    <ItemGroup>
+      <!-- Remove NETStandard DLLs -->
+      <_PackagesToPack Remove="@(_PackagesToPack)" Condition="%(NuGetPackageId) == 'NETStandard.Library'" />
+    </ItemGroup>
+
+    <Message Importance="High" Text="Adding DLLs from the following packages: @(_PackagesToPack->'%(NuGetPackageId)')" />
+
+    <ItemGroup>
+      <!-- Update the collection of items to pack with the DLLs from the NuGet packages -->
+      <None Include="@(_PackagesToPack)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+      <!-- Add the DLL produced by the current project to the NuGet package -->
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+  </Target>
+
 </Project>

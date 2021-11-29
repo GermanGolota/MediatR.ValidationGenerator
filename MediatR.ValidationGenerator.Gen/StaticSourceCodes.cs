@@ -1,4 +1,139 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿namespace MediatR.ValidationGenerator.Gen
+{
+    public static class StaticSourceCodes
+    {
+        public static readonly string Validator = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+
+namespace MediatR.ValidationGenerator
+{
+    public interface IValidator<in T>
+    {
+        ValidationResult Validate(T value);
+    }
+
+    public class ValidationResult
+    {
+        public ValidationResult(bool isValid, List<ValidationFailure> errors)
+        {
+            IsValid = isValid;
+            Errors = errors;
+        }
+        //
+        // Summary:
+        //     Whether validation succeeded
+        public virtual bool IsValid { get; }
+        //
+        // Summary:
+        //     A collection of errors
+        public List<ValidationFailure> Errors { get; }
+    }
+
+    public class ValidationFailure
+    {
+        public ValidationFailure(string propertyName, string errorMessage)
+        {
+            PropertyName = propertyName;
+            ErrorMessage = errorMessage;
+        }
+        //
+        // Summary:
+        //     The name of the property.
+        public string PropertyName { get; set; }
+        //
+        // Summary:
+        //     The error message
+        public string ErrorMessage { get; set; }
+    }
+
+    /// <summary>
+    /// An exception that represents failed validation
+    /// </summary>
+    public class ValidationException : Exception
+    {
+        /// <summary>
+        /// Validation errors
+        /// </summary>
+        public IEnumerable<ValidationFailure> Errors { get; private set; }
+
+        /// <summary>
+        /// Creates a new ValidationException
+        /// </summary>
+        /// <param name=""errors""></param>
+        public ValidationException(IEnumerable<ValidationFailure> errors) : base(BuildErrorMessage(errors))
+        {
+            Errors = errors;
+        }
+
+        private static string BuildErrorMessage(IEnumerable<ValidationFailure> errors)
+        {
+            var arr = errors.Select(x => $""{Environment.NewLine} -- {x.PropertyName}: {x.ErrorMessage}"");
+            return ""Validation failed: "" + string.Join(string.Empty, arr);
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException(""info"");
+
+            info.AddValue(""errors"", Errors);
+            base.GetObjectData(info, context);
+        }
+    }
+
+}
+";
+
+        public static readonly string Behavior = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MediatR.ValidationGenerator
+{
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+         where TRequest : IRequest<TResponse>
+    {
+        private readonly IEnumerable<IValidator<TRequest>> _validators;
+
+        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+        {
+            _validators = validators;
+        }
+
+        public Task<TResponse> Handle(TRequest request,
+            CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next
+        )
+        {
+            List<ValidationFailure> failures = new List<ValidationFailure>();
+            foreach (var validator in _validators)
+            {
+                var result = validator.Validate(request);
+                if (result.Errors is null == false)
+                {
+                    failures.AddRange(result.Errors);
+                }
+            }
+
+            if (failures.Count > 0)
+            {
+                throw new ValidationException(failures);
+            }
+
+            return next();
+        }
+    }
+}
+
+";
+
+        public static readonly string DIExtensions = @"
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -28,11 +163,11 @@ namespace MediatR.ValidationGenerator
         /// <summary>
         /// Adds all validators in specified assembly
         /// </summary>
-        /// <param name="services">The collection of services</param>
-        /// <param name="assembly">The assembly to scan</param>
-        /// <param name="lifetime">The lifetime of the validators. The default is scoped (per-request in web application)</param>
-        /// <param name="filter">Optional filter that allows certain types to be skipped from registration.</param>
-        /// <param name="includeInternalTypes">Include internal validators. The default is false.</param>
+        /// <param name=""services"">The collection of services</param>
+        /// <param name=""assembly"">The assembly to scan</param>
+        /// <param name=""lifetime"">The lifetime of the validators. The default is scoped (per-request in web application)</param>
+        /// <param name=""filter"">Optional filter that allows certain types to be skipped from registration.</param>
+        /// <param name=""includeInternalTypes"">Include internal validators. The default is false.</param>
         /// <returns></returns>
         public static IServiceCollection AddValidatorsFromAssembly(this IServiceCollection services, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped, Func<AssemblyScanner.AssemblyScanResult, bool> filter = null, bool includeInternalTypes = false)
         {
@@ -46,10 +181,10 @@ namespace MediatR.ValidationGenerator
         /// <summary>
         /// Helper method to register a validator from an AssemblyScanner result
         /// </summary>
-        /// <param name="services">The collection of services</param>
-        /// <param name="scanResult">The scan result</param>
-        /// <param name="lifetime">The lifetime of the validators. The default is scoped (per-request in web applications)</param>
-        /// <param name="filter">Optional filter that allows certain types to be skipped from registration.</param>
+        /// <param name=""services"">The collection of services</param>
+        /// <param name=""scanResult"">The scan result</param>
+        /// <param name=""lifetime"">The lifetime of the validators. The default is scoped (per-request in web applications)</param>
+        /// <param name=""filter"">Optional filter that allows certain types to be skipped from registration.</param>
         /// <returns></returns>
         private static IServiceCollection AddScanResult(this IServiceCollection services, AssemblyScanner.AssemblyScanResult scanResult, ServiceLifetime lifetime, Func<AssemblyScanner.AssemblyScanResult, bool> filter)
         {
@@ -130,7 +265,7 @@ namespace MediatR.ValidationGenerator
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
             /// <returns>
-            /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+            /// A <see cref=""T:System.Collections.Generic.IEnumerator`1""/> that can be used to iterate through the collection.
             /// </returns>
             /// <filterpriority>1</filterpriority>
             public IEnumerator<AssemblyScanResult> GetEnumerator()
@@ -168,5 +303,8 @@ namespace MediatR.ValidationGenerator
                 public Type ValidatorType { get; private set; }
             }
         }
+    }
+}
+";
     }
 }
