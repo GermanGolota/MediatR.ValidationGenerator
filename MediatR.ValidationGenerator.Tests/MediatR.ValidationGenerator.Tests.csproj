@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MediatR.ValidationGenerator.Gen\MediatR.ValidationGenerator.Gen.csproj" />
+    <ProjectReference Include="..\MediatR.ValidationGenerator\MediatR.ValidationGenerator.csproj" />
   </ItemGroup>
 
 </Project>

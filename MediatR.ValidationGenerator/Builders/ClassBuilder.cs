@@ -1,12 +1,12 @@
-﻿using MediatR.ValidationGenerator.Gen.Builders.Abstractions;
-using MediatR.ValidationGenerator.Gen.Extensions;
-using MediatR.ValidationGenerator.Gen.Models;
+﻿using MediatR.ValidationGenerator.Builders.Abstractions;
+using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Builders
+namespace MediatR.ValidationGenerator.Builders
 {
     public class ClassBuilder : ValidatingBuilder
     {
@@ -66,7 +66,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
         public ClassBuilder WithConstructor(Func<ClassConstructorBuilder, ClassConstructorBuilder> constructorBuilder)
         {
             var initalCtor = new ClassConstructorBuilder(2)
-                .WithClassName(this._className);
+                .WithClassName(_className);
             _constructor = constructorBuilder(initalCtor);
             return this;
         }
@@ -133,7 +133,7 @@ namespace MediatR.ValidationGenerator.Gen.Builders
             string implements = "";
             if (_implementsList.Count > 0)
             {
-                implements = $" : {String.Join(",", implementsList)}";
+                implements = $" : {string.Join(",", implementsList)}";
             }
             return $"{className}{implements}";
         }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
-namespace MediatR.ValidationGenerator.Gen
+namespace MediatR.ValidationGenerator
 {
     public class RequestValidationModel
     {

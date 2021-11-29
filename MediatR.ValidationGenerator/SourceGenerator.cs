@@ -1,14 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using MediatR.ValidationGenerator.Gen.Extensions;
-using System.Diagnostics;
 using System.Linq;
-using MediatR.ValidationGenerator.Gen.RoslynUtils;
 using System.Text;
+using MediatR.ValidationGenerator.Models;
+using MediatR.ValidationGenerator.RoslynUtils;
 
-namespace MediatR.ValidationGenerator.Gen
+namespace MediatR.ValidationGenerator
 {
     [Generator]
     public class SourceGenerator : ISourceGenerator
@@ -47,7 +44,7 @@ namespace MediatR.ValidationGenerator.Gen
             }
         }
 
-        private Diagnostic CreateDiagnostic(GeneratorExecutionContext context, RequestValidationModel validationModel, Models.ValueOrNull<string> creationResult)
+        private Diagnostic CreateDiagnostic(GeneratorExecutionContext context, RequestValidationModel validationModel, ValueOrNull<string> creationResult)
         {
             var request = validationModel.RequestClass;
             var requestSymbol = context.Compilation.GetSemanticModel(request.SyntaxTree).GetDeclaredSymbol(request);

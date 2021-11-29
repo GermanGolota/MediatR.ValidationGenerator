@@ -1,9 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen
+namespace MediatR.ValidationGenerator
 {
     public static class DiagnosticDescriptors
     {

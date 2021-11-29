@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Extensions
+namespace MediatR.ValidationGenerator.Extensions
 {
     internal static class GeneralExtensions
     {
         public static bool IsEmpty(this string str)
         {
-            return String.IsNullOrEmpty(str);
+            return string.IsNullOrEmpty(str);
         }
 
         public static bool IsNotEmpty(this string str)

@@ -1,8 +1,7 @@
-using MediatR.ValidationGenerator.Gen.Builders;
-using System;
+using MediatR.ValidationGenerator.Builders;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Gen.Tests.Builders
+namespace MediatR.ValidationGenerator.Tests.Builders
 {
     public class MethodBodyBuilderTests
     {

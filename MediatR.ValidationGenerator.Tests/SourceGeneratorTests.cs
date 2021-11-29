@@ -1,14 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Gen.Tests
+namespace MediatR.ValidationGenerator.Tests
 {
     public class SourceGeneratorTests
     {

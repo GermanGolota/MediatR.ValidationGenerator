@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace MediatR.ValidationGenerator.Gen.Extensions
+namespace MediatR.ValidationGenerator.Extensions
 {
     public static class StringBuilderExtensions
     {
