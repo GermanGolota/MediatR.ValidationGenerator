@@ -1,4 +1,6 @@
-﻿using MediatR.ValidationGenerator.Gen.RuleGenerators;
+﻿using MediatR.ValidationGenerator.Gen.Builders;
+using MediatR.ValidationGenerator.Gen.Models;
+using MediatR.ValidationGenerator.Gen.RuleGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -14,12 +16,13 @@ namespace MediatR.ValidationGenerator.Gen
             return generators.Any(x => x.IsMatchingAttribute(attribute));
         }
 
-        public static List<string> CreateRulesForAttributes(
+        public static List<SuccessOrFailure> AppendRulesForAttribute(
+            MethodBodyBuilder builder,
             PropertyDeclarationSyntax prop,
             IEnumerable<AttributeSyntax> attributes
             )
         {
-            List<string> rules = new List<string>();
+            List<SuccessOrFailure> successOrFailures = new List<SuccessOrFailure>();
             var generators = RuleGeneratorsCollector.Collect();
             foreach (var attribute in attributes)
             {
@@ -27,15 +30,12 @@ namespace MediatR.ValidationGenerator.Gen
                 {
                     if (generator.IsMatchingAttribute(attribute))
                     {
-                        var rule = generator.GenerateRuleFor(prop, attribute);
-                        if (rule.HasValue)
-                        {
-                            rules.AddRange(rule.Value);
-                        }
+                        var result = generator.GenerateRuleFor(prop, attribute, builder);
+                        successOrFailures.Add(result);
                     }
                 }
             }
-            return rules;
+            return successOrFailures;
         }
     }
 }

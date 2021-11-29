@@ -1,9 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Gen.Builders;
-using MediatR.ValidationGenerator.Gen.Extensions;
 using MediatR.ValidationGenerator.Gen.Models;
 using MediatR.ValidationGenerator.Gen.RoslynUtils;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MediatR.ValidationGenerator.Gen
 {
@@ -43,20 +40,14 @@ namespace MediatR.ValidationGenerator.Gen
                                         var attributes = entry.Value;
 
                                         body.AppendLine($"#region {prop.Identifier}Validation");
-                                        List<string> rules = AttributeService.CreateRulesForAttributes(prop, attributes);
-
-                                        for (int i = 0; i < rules.Count; i++)
-                                        {
-                                            var rule = rules[i];
-                                            body.AppendLine(rule, 1, true);
-                                        }
+                                        //TODO: diagnostics
+                                        var results = AttributeService.AppendRulesForAttribute(body, prop, attributes);
                                         body.AppendLine($"#endregion");
                                     }
 
-                                    body.AppendLine($"return new ValidationResult()");
+                                    body.AppendLine($"return new ValidationResult({VALIDATOR_VALIDITY_NAME}, {VALIDATOR_ERRORS_LIST_NAME})");
 
                                     return body;
-
                                 });
                      });
 
