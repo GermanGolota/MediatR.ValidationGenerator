@@ -3,13 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" PrivateAssets="all" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"  IncludeInPackage="true"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" IncludeInPackage="true" />
     <PackageReference Include="MediatR" Version="9.0.0" IncludeInPackage="true" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" IncludeInPackage="true"/>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" IncludeInPackage="true" />
   </ItemGroup>
 
   <ItemGroup>
