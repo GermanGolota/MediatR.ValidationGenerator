@@ -1,53 +1,46 @@
 ﻿using MediatR.ValidationGenerator.Builders;
-using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public class RequiredRuleGenerator : IRuleGenerator
     {
         private readonly string _requiredAttributeName = AttributeHelper.GetProperName(nameof(RequiredAttribute));
-        public bool IsMatchingAttribute(AttributeSyntax attribute)
+        public bool IsMatchingAttribute(AttributeData attribute)
         {
-            string attributeName = attribute.Name.ToString();
+            string attributeName = attribute.AttributeClass?.Name ?? "";
             return attributeName == _requiredAttributeName;
         }
 
-        private static string GetCustomErrorMessageOrNull(AttributeSyntax attribute)
+        private static string? GetCustomErrorMessageOrNull(AttributeData attribute)
         {
-            string customeErrorMessage = null;
-            var arguments = attribute.ArgumentList?.Arguments;
-            if (arguments.HasValue)
+            string? customErrorMessage = null;
+            var args = attribute.NamedArguments;
+            foreach (var arg in args)
             {
-                var errorMessages = arguments.Value
-                                    .Where(x => x.NameEquals.Name.Identifier.ToString() == "ErrorMessage");
-
-                if (errorMessages.Any())
+                var argName = arg.Key;
+                if (argName == "ErrorMessage")
                 {
-                    var errorMessage = errorMessages.First();
-                    if (errorMessage.Expression is LiteralExpressionSyntax literalSyntax)
-                    {
-                        customeErrorMessage = literalSyntax.Token.Value?.ToString();
-                    }
+                    var argVal = arg.Value;
+                    customErrorMessage = argVal.Value?.ToString();
+                    break;
                 }
             }
-
-            return customeErrorMessage;
+            return customErrorMessage;
         }
 
-        public SuccessOrFailure GenerateRuleFor(PropertyDeclarationSyntax prop, AttributeSyntax attribute, MethodBodyBuilder body)
+        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
             string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
             string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
 
-            string fullProp = $"{ param }.{ prop.Identifier}";
-            string errorMessage = GetCustomErrorMessageOrNull(attribute);
-            if (errorMessage.IsEmpty())
+            string fullProp = $"{ param }.{ prop.Name}";
+            string? errorMessage = GetCustomErrorMessageOrNull(attribute);
+            if (errorMessage is null)
             {
                 errorMessage = "Empty required valued";
             }

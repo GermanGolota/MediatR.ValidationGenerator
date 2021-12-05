@@ -10,7 +10,7 @@ namespace MediatR.ValidationGenerator
 {
     public static class AttributeService
     {
-        public static bool AttributeIsSupported(AttributeSyntax attribute)
+        public static bool AttributeIsSupported(AttributeData attribute)
         {
             var generators = RuleGeneratorsCollector.Collect();
             return generators.Any(x => x.IsMatchingAttribute(attribute));
@@ -18,8 +18,8 @@ namespace MediatR.ValidationGenerator
 
         public static List<SuccessOrFailure> AppendRulesForAttribute(
             MethodBodyBuilder builder,
-            PropertyDeclarationSyntax prop,
-            IEnumerable<AttributeSyntax> attributes
+            IPropertySymbol prop,
+            IEnumerable<AttributeData> attributes
             )
         {
             List<SuccessOrFailure> successOrFailures = new List<SuccessOrFailure>();

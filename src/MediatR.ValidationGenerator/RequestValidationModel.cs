@@ -1,19 +1,21 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace MediatR.ValidationGenerator
 {
     public class RequestValidationModel
     {
-        public RequestValidationModel(ClassDeclarationSyntax requestClass)
+        public RequestValidationModel(ITypeSymbol requestClass)
         {
             RequestClass = requestClass;
         }
 
-        public ClassDeclarationSyntax RequestClass { get; set; }
-        public Dictionary<PropertyDeclarationSyntax, List<AttributeSyntax>> PropertyToSupportedAttributes { get; set; } =
-            new Dictionary<PropertyDeclarationSyntax, List<AttributeSyntax>>();
+        public ITypeSymbol RequestClass { get; }
+        public Dictionary<IPropertySymbol, ImmutableArray<AttributeData>> PropertyToSupportedAttributes { get; } =
+            new Dictionary<IPropertySymbol, ImmutableArray<AttributeData>>(SymbolEqualityComparer.Default);
 
-        public string ValidatorName => $"{RequestClass.Identifier.Text}Validator";
+        public string ValidatorName => $"{RequestClass.MetadataName}Validator";
     }
 }
