@@ -23,7 +23,7 @@ namespace MediatR.ValidationGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var receiver = context.SyntaxReceiver as TypeSyntaxReceiver;
+           /* var receiver = context.SyntaxReceiver as TypeSyntaxReceiver;
             var classContext = receiver.Types;
             var requestClasses = ClassSorter.SortClassesThatImplement(classContext, "IRequest");
             var validationModels = ValidationModelCreator.GetValidationModels(classContext, requestClasses);
@@ -41,15 +41,14 @@ namespace MediatR.ValidationGenerator
                     Diagnostic error = CreateDiagnostic(context, validationModel, creationResult);
                     errors.Add(error);
                 }
-            }
+            }*/
         }
 
         private Diagnostic CreateDiagnostic(GeneratorExecutionContext context, RequestValidationModel validationModel, ValueOrNull<string> creationResult)
         {
             var request = validationModel.RequestClass;
-            var requestSymbol = context.Compilation.GetSemanticModel(request.SyntaxTree).GetDeclaredSymbol(request);
-            var location = requestSymbol.Locations.FirstOrDefault();
-            var error = Diagnostic.Create(DiagnosticDescriptors.FailedToCreateValidatorDescriptor, location, request.Identifier.Text, creationResult.NullMessage);
+            var location = request.Locations.FirstOrDefault();
+            var error = Diagnostic.Create(DiagnosticDescriptors.FailedToCreateValidatorDescriptor, location, request.MetadataName, creationResult.NullMessage);
             return error;
         }
 

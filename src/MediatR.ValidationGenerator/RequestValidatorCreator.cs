@@ -14,8 +14,8 @@ namespace MediatR.ValidationGenerator
         public static readonly string VALIDATORS_NAMESPACE = "Validators.Generated";
         public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
         {
-            string requestClassName = model.RequestClass.Identifier.ToString();
-            string requestNamespace = GetRequestNamespace(model);
+            string requestClassName = model.RequestClass.MetadataName;
+            string requestNamespace = model.RequestClass.ContainingNamespace.Name;
 
             var classBuilder = new ClassBuilder()
                      .WithClassName($"{model.ValidatorName}")
@@ -42,7 +42,7 @@ namespace MediatR.ValidationGenerator
                                         var prop = entry.Key;
                                         var attributes = entry.Value;
 
-                                        body.AppendLine($"#region {prop.Identifier}Validation");
+                                        body.AppendLine($"#region {prop.Name}Validation");
                                         //TODO: diagnostics
                                         var results = AttributeService.AppendRulesForAttribute(body, prop, attributes);
                                         body.AppendLine($"#endregion");
@@ -55,22 +55,6 @@ namespace MediatR.ValidationGenerator
                      });
 
             return classBuilder.Build();
-        }
-
-        private static string GetRequestNamespace(RequestValidationModel model)
-        {
-            var namespaceResult = SyntaxUtils.GetNamespace(model.RequestClass);
-            string requestNamespace;
-            if (namespaceResult.IsNull)
-            {
-                requestNamespace = "System.Linq"; //TODO: Output error message
-            }
-            else
-            {
-                requestNamespace = namespaceResult.Value;
-            }
-
-            return requestNamespace;
         }
     }
 }
