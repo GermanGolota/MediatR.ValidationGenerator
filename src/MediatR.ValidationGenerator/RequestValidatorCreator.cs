@@ -23,7 +23,7 @@ namespace MediatR.ValidationGenerator
                      .UsingNamespace("System.Collections")
                      .UsingNamespace("System.Collections.Generic")
                      .UsingNamespace("System.Text.RegularExpressions")
-                     .UsingNamespace("MediatR.ValidationGenerator.Internal")
+                     .UsingNamespace(GlobalNames.InternalNamespace)
                      .UsingNamespace(requestNamespace)
                      .Implementing($"IValidator<{requestClassName}>")
                      .WithMethod(method =>

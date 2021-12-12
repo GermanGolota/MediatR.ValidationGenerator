@@ -7,6 +7,32 @@ namespace MediatR.ValidationGenerator.Extensions
 {
     internal static class GeneralExtensions
     {
+        public static string GetFromGlobal(this string name, string namespaceName)
+        {
+            StringBuilder sb = new();
+            sb.Append("global::");
+            sb.Append(namespaceName);
+            bool namespaceHasDot = namespaceName.EndsWith(".");
+            bool nameHasDot = name.StartsWith(".");
+            if (namespaceHasDot == nameHasDot)
+            {
+                if (namespaceHasDot)
+                {
+                    sb.Remove(sb.Length - 1, 1);
+                }
+                else
+                {
+                    sb.Append(".");
+                }
+            }
+            sb.Append(name);
+            if (nameHasDot)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            return sb.ToString();
+        }
+
         public static bool IsEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
