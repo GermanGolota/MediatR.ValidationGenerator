@@ -59,7 +59,7 @@ namespace MediatR.ValidationGenerator.RuleGenerators
                     break;
                 }
             }
-            return $"\"customErrorMessage\"";
+            return $"\"{customErrorMessage}\"";
         }
 
         private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
