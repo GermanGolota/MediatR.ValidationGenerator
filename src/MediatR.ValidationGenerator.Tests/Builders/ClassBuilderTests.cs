@@ -37,8 +37,11 @@ namespace TestNamespace
             //Act
             var actualClass = builder.Build();
             //Assert
-            Assert.True(actualClass.HasValue);
-            Assert.Equal(expectedClass, actualClass.Value);
+            actualClass.Resolve(
+                classStr => Assert.Equal(expectedClass, classStr),
+                //should not get called
+                _ => Assert.True(false)
+                );
         }
     }
 }

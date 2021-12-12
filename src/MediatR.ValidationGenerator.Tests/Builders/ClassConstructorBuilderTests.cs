@@ -25,10 +25,13 @@ public Test(int margin)
 }
 ".RemoveFirstNewLine();
             //Act
-            var actual = constructorBuilder.Build();
+            var actualResult = constructorBuilder.Build();
             //Assert
-            Assert.True(actual.HasValue);
-            Assert.Equal(expected, actual.Value);
+            actualResult.Resolve(
+               actual => Assert.Equal(expected, actual),
+               //should not get called
+               _ => Assert.True(false)
+               );
         }
     }
 }
