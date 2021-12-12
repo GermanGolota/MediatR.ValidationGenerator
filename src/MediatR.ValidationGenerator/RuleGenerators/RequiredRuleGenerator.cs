@@ -22,7 +22,6 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 
             string fullProp = $"{ param }.{ prop.Name}";
             string errorMessage = GetCustomErrorMessage(attribute) ?? "\"Empty required value\"";
-
             bool allowEmpty = ShouldAllowEmptyStr(attribute);
 
             string condition = GetCondition(prop.Type, fullProp, allowEmpty);
@@ -40,6 +39,7 @@ namespace MediatR.ValidationGenerator.RuleGenerators
                 {
                     string val = arg.Value.Value?.ToString() ?? "false";
                     Boolean.TryParse(val, out allowEmpty);
+                    break;
                 }
             }
             return allowEmpty;
@@ -59,7 +59,17 @@ namespace MediatR.ValidationGenerator.RuleGenerators
                     break;
                 }
             }
-            return $"\"{customErrorMessage}\"";
+
+            string? result;
+            if (String.IsNullOrEmpty(customErrorMessage))
+            {
+                result = null;
+            }
+            else
+            {
+                result = $"\"{customErrorMessage}\"";
+            }
+            return result;
         }
 
         private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
