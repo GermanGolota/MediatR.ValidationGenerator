@@ -8,11 +8,11 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public class RequiredRuleGenerator : IRuleGenerator
     {
-        private readonly string _requiredAttributeName = AttributeHelper.GetProperName(nameof(RequiredAttribute));
+        private readonly string _requiredAttributeName = nameof(RequiredAttribute);
         public bool IsMatchingAttribute(AttributeData attribute)
         {
             string attributeName = attribute.AttributeClass?.Name ?? "";
-            return attributeName == _requiredAttributeName;
+            return AttributeHelper.IsTheSameAttribute(attributeName, _requiredAttributeName);
         }
 
         private static string? GetCustomErrorMessageOrNull(AttributeData attribute)

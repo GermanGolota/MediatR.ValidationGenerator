@@ -9,8 +9,6 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator
 {
-    public record TypeScanResult(ITypeSymbol Type, bool ImplementsIRequest);
-
     [Generator(LanguageNames.CSharp)]
     public class ValidatorsGenerator : IIncrementalGenerator
     {
@@ -28,10 +26,10 @@ namespace MediatR.ValidationGenerator
                     static (s, _) => s is ClassDeclarationSyntax,
                     static (ctx, _) =>
                     {
-                        var info = ctx.SemanticModel.GetTypeInfo(ctx.Node);
-                        var type = info.Type;
+                        var info = ctx.SemanticModel.GetDeclaredSymbol(ctx.Node);
+                        var type = info as ITypeSymbol;
                         TypeScanResult? result;
-                        if (type is not null)
+                        if (type is not null && IsConcreate(type))
                         {
                             result = new(type, IsImplementing(type));
                         }
@@ -51,15 +49,20 @@ namespace MediatR.ValidationGenerator
 
             context.RegisterSourceOutput(compilationAndTypes,
                 static (spc, source) => Execute(source.Left, source.Right, spc));
-            throw new NotImplementedException();
         }
+
+        private static bool IsConcreate(ITypeSymbol type)
+        {
+            return type.IsAbstract == false;
+        }
+
         private static RequestValidationModel? GetValidationModel(TypeScanResult scanResult)
         {
             var type = scanResult!.Type;
             RequestValidationModel? result;
             if (type is not null)
             {
-                var props = type.GetMembers().OfType<IPropertySymbol>();
+                var props = GetAllProps(type);
                 if (props is not null)
                 {
                     var requestModel = new RequestValidationModel(type);
@@ -79,6 +82,24 @@ namespace MediatR.ValidationGenerator
             {
                 result = null;
             }
+            return result;
+        }
+
+        private static List<IPropertySymbol> GetAllProps(ITypeSymbol type)
+        {
+            List<IPropertySymbol> result = type.GetMembers().OfType<IPropertySymbol>().ToList();
+
+            List<INamedTypeSymbol> baseTypes = type.Interfaces
+                .Union(new[] { type.BaseType })
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
+
+            foreach (var baseType in baseTypes)
+            {
+                result.AddRange(GetAllProps(baseType));
+            }
+
             return result;
         }
 
