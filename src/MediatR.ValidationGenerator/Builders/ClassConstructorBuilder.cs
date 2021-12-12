@@ -93,11 +93,8 @@ namespace MediatR.ValidationGenerator.Builders
             string signature = BuildSignature();
             constructorBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             constructorBuilder.AppendLine(signature);
-            var body = GetBody().Build();
-            if (body.HasValue)
-            {
-                constructorBuilder.Append(body.Value);
-            }
+            var bodyResult = GetBody().Build();
+            bodyResult.Resolve(body => constructorBuilder.Append(body));
             return constructorBuilder.ToString();
         }
 

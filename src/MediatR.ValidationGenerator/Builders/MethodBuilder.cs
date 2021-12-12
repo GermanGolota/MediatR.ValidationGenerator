@@ -127,14 +127,11 @@ namespace MediatR.ValidationGenerator.Builders
         protected override string BuildInner()
         {
             string signature = BuildSignature();
-            var body = GetBody().Build();
+            var bodyResult = GetBody().Build();
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(signature);
-            if (body.HasValue)
-            {
-                sb.Append(body.Value);
-            }
+            bodyResult.Resolve(body => sb.Append(body));
 
             return sb.ToString();
         }
