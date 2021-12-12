@@ -8,6 +8,21 @@ namespace MediatR.ValidationGenerator.Extensions
 {
     internal static class RoslynExtensions
     {
+        public static string GetGlobalName(this ITypeSymbol type)
+        {
+            return type.MetadataName.GetFromGlobal(type.ContainingNamespace.MetadataName);
+        }
+
+        public static string GetFullName(this ITypeSymbol type)
+        {
+            return $"{type.ContainingNamespace.MetadataName}.{type.MetadataName}";
+        }
+
+        public static bool IsType(this ITypeSymbol type, string typeFullName)
+        {
+            return type.GetFullName().Equals(typeFullName);
+        }
+
         public static bool IsNotAbstract(this TypeDeclarationSyntax syntax)
         {
             var members = syntax.Modifiers;

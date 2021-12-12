@@ -64,8 +64,18 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
             return Task.FromResult(value);
         }
     }
-}
+},
 ",
+                @"
+namespace MediatR.ValidationGenerator.Gen.Tests
+{
+    public static class Program
+    {
+        public static void Main(string[] args)
+        {}
+    }
+}
+"
             };
             #endregion
             Compilation inputCompilation = CreateCompilation(sources);
@@ -75,7 +85,9 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
             GeneratorDriverRunResult result = driver.GetRunResult();
             //Assert
-            //do not throws
+            Assert.Empty(diagnostics);
+            Assert.Empty(result.Diagnostics);
+            Assert.NotEmpty(result.GeneratedTrees);
         }
 
         private static Compilation CreateCompilation(List<string> sources)

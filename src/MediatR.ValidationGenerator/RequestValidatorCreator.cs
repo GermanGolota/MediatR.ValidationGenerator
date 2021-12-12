@@ -1,5 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Models;
+using MediatR.ValidationGenerator.Extensions;
 
 namespace MediatR.ValidationGenerator
 {
@@ -15,27 +16,22 @@ namespace MediatR.ValidationGenerator
         {
             string requestClassName = model.RequestClass.MetadataName;
             string requestNamespace = model.RequestClass.ContainingNamespace.ToDisplayString();
+            string requestGlobalName = requestClassName.GetFromGlobal(requestNamespace);
 
             var classBuilder = new ClassBuilder()
                      .WithClassName($"{model.ValidatorName}")
                      .WithNamespace(VALIDATORS_NAMESPACE)
-                     .UsingNamespace("System")
-                     .UsingNamespace("System.Collections")
-                     .UsingNamespace("System.Collections.Generic")
-                     .UsingNamespace("System.Text.RegularExpressions")
-                     .UsingNamespace("MediatR.ValidationGenerator.Internal")
-                     .UsingNamespace(requestNamespace)
-                     .Implementing($"IValidator<{requestClassName}>")
+                     .Implementing($"{GlobalNames.InternalNamespace}.IValidator<{requestGlobalName}>")
                      .WithMethod(method =>
                      {
                          return method.WithName(VALIDATE_METHOD_NAME)
-                                .WithReturnType("ValidationResult")
-                                .WithParameter(requestClassName, VALIDATOR_PARAMETER_NAME)
+                                .WithReturnType(GlobalNames.ValidationResult)
+                                .WithParameter(requestGlobalName, VALIDATOR_PARAMETER_NAME)
                                 .WithBody(body =>
                                 {
                                     body
                                        .AppendLine($"bool {VALIDATOR_VALIDITY_NAME} = true")
-                                       .AppendLine($"List<ValidationFailure> {VALIDATOR_ERRORS_LIST_NAME} = new List<ValidationFailure>()");
+                                       .AppendLine($"{GlobalNames.List}<{GlobalNames.ValidationFailure}> {VALIDATOR_ERRORS_LIST_NAME} = new {GlobalNames.List}<{GlobalNames.ValidationFailure}>()");
 
                                     foreach (var entry in model.PropertyToSupportedAttributes)
                                     {
@@ -48,7 +44,7 @@ namespace MediatR.ValidationGenerator
                                         body.AppendLine($"#endregion");
                                     }
 
-                                    body.AppendLine($"return new ValidationResult({VALIDATOR_VALIDITY_NAME}, {VALIDATOR_ERRORS_LIST_NAME})");
+                                    body.AppendLine($"return new {GlobalNames.ValidationResult}({VALIDATOR_VALIDITY_NAME}, {VALIDATOR_ERRORS_LIST_NAME})");
 
                                     return body;
                                 });

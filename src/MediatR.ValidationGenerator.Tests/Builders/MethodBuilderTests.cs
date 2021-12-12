@@ -30,10 +30,13 @@ public int Sum(int a, int b)
 "
 .RemoveFirstNewLine();
             //Act
-            ValueOrNull<string> actualMethod = builder.Build();
+            ValueOrNull<string> actualResult = builder.Build();
             //Assert
-            Assert.True(actualMethod.HasValue);
-            Assert.Equal(expectedMethod, actualMethod.Value);
+            actualResult.Resolve(
+            actual => Assert.Equal(expectedMethod, actual),
+               //should not get called
+               _ => Assert.True(false)
+               );
         }
 
         [Fact]

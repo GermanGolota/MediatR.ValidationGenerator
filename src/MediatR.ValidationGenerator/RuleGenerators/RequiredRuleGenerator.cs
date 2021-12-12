@@ -1,7 +1,8 @@
 ﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
@@ -15,58 +16,100 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             return AttributeHelper.IsTheSameAttribute(attributeName, _requiredAttributeName);
         }
 
-        private static string? GetCustomErrorMessageOrNull(AttributeData attribute)
+        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        {
+            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
+
+            string fullProp = $"{ param }.{ prop.Name}";
+            string errorMessage = GetCustomErrorMessage(attribute) ?? "\"Empty required value\"";
+            bool allowEmpty = ShouldAllowEmptyStr(attribute);
+
+            string condition = GetCondition(prop.Type, fullProp, allowEmpty);
+            body.AppendNotEnding($"if({condition})");
+            body.AppendError($"nameof({fullProp})", errorMessage, true);
+            return true;
+        }
+
+        private bool ShouldAllowEmptyStr(AttributeData attribute)
+        {
+            bool allowEmpty = false;
+            foreach (var arg in attribute.NamedArguments)
+            {
+                if (arg.Key == nameof(RequiredAttribute.AllowEmptyStrings))
+                {
+                    string val = arg.Value.Value?.ToString() ?? "false";
+                    Boolean.TryParse(val, out allowEmpty);
+                    break;
+                }
+            }
+            return allowEmpty;
+        }
+
+        private static string? GetCustomErrorMessage(AttributeData attribute)
         {
             string? customErrorMessage = null;
             var args = attribute.NamedArguments;
             foreach (var arg in args)
             {
                 var argName = arg.Key;
-                if (argName == "ErrorMessage")
+                if (argName == nameof(RequiredAttribute.ErrorMessage))
                 {
                     var argVal = arg.Value;
                     customErrorMessage = argVal.Value?.ToString();
                     break;
                 }
             }
-            return customErrorMessage;
+
+            string? result;
+            if (String.IsNullOrEmpty(customErrorMessage))
+            {
+                result = null;
+            }
+            else
+            {
+                result = $"\"{customErrorMessage}\"";
+            }
+            return result;
         }
 
-        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
         {
-            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
-            string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
-            string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
-
-            string fullProp = $"{ param }.{ prop.Name}";
-            string? errorMessage = GetCustomErrorMessageOrNull(attribute);
-            if (errorMessage is null)
+            string condition;
+            if (type.IsType("System.String") && allowEmpty == false)
             {
-                errorMessage = "Empty required valued";
+                condition = $"{GlobalNames.String}.IsNullOrWhiteSpace({fullProp})";
+            }
+            else
+            {
+                string firstCondition;
+                if (type.IsValueType)
+                {
+                    string typeGlobalName = type.GetGlobalName();
+                    firstCondition = $"{fullProp}.Equals(default({typeGlobalName}))";
+                }
+                else
+                {
+                    firstCondition = $"{fullProp} == null";
+                }
+
+                string? secondCondition = null;
+                if (type.IsImplementing("ICollection", "System.Collections")
+                   || type.IsImplementing("ICollection`1", "System.Collections.Generic"))
+                {
+                    secondCondition = $"{fullProp}.Count == 0";
+                }
+                else
+                {
+                    if (type.IsImplementing("IEnumerable", "System.Collections"))
+                    {
+                        secondCondition = $"{fullProp}.GetEnumerator().MoveNext() == false";
+                    }
+                }
+                string second = secondCondition is null ? "" : $" && {secondCondition}";
+                condition = $"{firstCondition} { second }";
             }
 
-            //TODO: Generate validation based on prop type
-            body.AppendLine($"switch((object){fullProp})", endLine: false);
-            body.AppendLine("{", endLine: false);
-            List<string> cases = new List<string>()
-            {
-                "null",
-                "string s when String.IsNullOrWhiteSpace(s)",
-                "ICollection {Count: 0}",
-                "Array {Length: 0}",
-                "IEnumerable e when !e.GetEnumerator().MoveNext()"
-            };
-
-            foreach (var matchCase in cases)
-            {
-                body.AppendLine($"case {matchCase}:", 1, endLine: false);
-            }
-            body.AppendLine($"{errors}.Add(new ValidationFailure(nameof({fullProp}), \"{errorMessage}\"))", 2);
-            body.AppendLine($"{validityFlag} = false", 2);
-            body.AppendLine("break", 2);
-            body.AppendLine("}", endLine: false);
-
-            return true;
+            return condition;
         }
     }
 }

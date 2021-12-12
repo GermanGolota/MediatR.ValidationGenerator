@@ -6,7 +6,6 @@ namespace MediatR.ValidationGenerator.RuleGenerators
     {
         private static readonly IEnumerable<IRuleGenerator> _generators;
 
-        //TODO: Perform reflection magic to get generators
         static RuleGeneratorsCollector()
         {
             _generators = new List<IRuleGenerator>()
