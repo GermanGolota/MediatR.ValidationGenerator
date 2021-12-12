@@ -15,7 +15,7 @@ namespace MediatR.ValidationGenerator
         public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
         {
             string requestClassName = model.RequestClass.MetadataName;
-            string requestNamespace = model.RequestClass.ContainingNamespace.Name;
+            string requestNamespace = model.RequestClass.ContainingNamespace.ToDisplayString();
 
             var classBuilder = new ClassBuilder()
                      .WithClassName($"{model.ValidatorName}")
@@ -23,8 +23,9 @@ namespace MediatR.ValidationGenerator
                      .UsingNamespace("System")
                      .UsingNamespace("System.Collections")
                      .UsingNamespace("System.Collections.Generic")
-                     .UsingNamespace(requestNamespace)
+                     .UsingNamespace("System.Text.RegularExpressions")
                      .UsingNamespace("MediatR.ValidationGenerator.Internal")
+                     .UsingNamespace(requestNamespace)
                      .Implementing($"IValidator<{requestClassName}>")
                      .WithMethod(method =>
                      {
