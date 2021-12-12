@@ -103,10 +103,11 @@ namespace MediatR.ValidationGenerator.Builders
             if (_constructor.IsNotNull())
             {
                 var buildResult = _constructor.Build();
-                if (buildResult.HasValue)
-                {
-                    result = buildResult.Value;
-                }
+                result = buildResult.Resolve(
+                    x => x,
+                    //TODO: report errors
+                    _ => ""
+                    );
             }
             return result;
         }
@@ -118,9 +119,16 @@ namespace MediatR.ValidationGenerator.Builders
             foreach (var method in methods)
             {
                 var methodBuildResult = method.Build();
+                methodBuildResult.Resolve(
+                methodStr =>
+                {
+                    classBodyBuilder.Append(methodStr);
+                }, 
+                //TODO: report errors
+                _ => { }
+                );
                 if (methodBuildResult.HasValue)
                 {
-                    classBodyBuilder.Append(methodBuildResult.Value);
                 }
             }
             return classBodyBuilder.ToString();
