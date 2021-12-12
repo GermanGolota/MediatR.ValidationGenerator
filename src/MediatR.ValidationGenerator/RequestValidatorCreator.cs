@@ -1,6 +1,5 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Models;
-using MediatR.ValidationGenerator.RoslynUtils;
 
 namespace MediatR.ValidationGenerator
 {
