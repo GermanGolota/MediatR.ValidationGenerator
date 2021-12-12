@@ -9,7 +9,7 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public class RegexRuleGenerator : IRuleGenerator
     {
-        private static readonly string _regexGlobal = 
+        private static readonly string _regexGlobal =
             "Regex".GetFromGlobal("System.Text.RegularExpressions");
 
         private static readonly string _regexOptionsGlobal =
@@ -30,15 +30,10 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             string? regex = GetRegex(attribute);
             if (regex is not null)
             {
-                string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
                 string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
-                string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
                 string fullProp = $"{ param }.{ prop.Name}";
-                body.AppendLine($"if({_regexGlobal}.IsMatch({fullProp}, \"{regex}\", {_regexOptionsGlobal}.None, {_timeSpanGlobal}.FromSeconds(3)) == false)", endLine: false);
-                body.AppendLine("{", endLine: false);
-                body.AppendLine($"{errors}.Add(new {GlobalNames.ValidationFailure}(nameof({fullProp}), \"Does not fulfill regex\"))", 1);
-                body.AppendLine($"{validityFlag} = false", 1);
-                body.AppendLine("}", endLine: false);
+                body.AppendNotEnding($"if({_regexGlobal}.IsMatch({fullProp}, \"{regex}\", {_regexOptionsGlobal}.None, {_timeSpanGlobal}.FromSeconds(3)) == false)");
+                body.AppendError($"nameof({fullProp})", "\"Does not fulfill regex\"", true);
                 result = true;
             }
             else
