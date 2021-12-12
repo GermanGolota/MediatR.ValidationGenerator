@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -13,6 +15,7 @@ namespace MediatR.ValidationGenerator.Tests
         public void Execute_ShouldNotThrow_WhenRequestsExist()
         {
             //Arrange
+            #region SourceCodes
             List<string> sources = new List<string>
             {
                 @"
@@ -62,10 +65,11 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
         }
     }
 }
-"
+",
             };
+            #endregion
             Compilation inputCompilation = CreateCompilation(sources);
-            SourceGenerator generator = new SourceGenerator();
+            var generator = new ValidatorsGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
             //Act
             driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
@@ -76,10 +80,37 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
 
         private static Compilation CreateCompilation(List<string> sources)
         {
+            var types = new[] {
+                typeof(Binder),
+                typeof(IBaseRequest),
+                typeof(RegularExpressionAttribute)
+            };
+
+            var locations = types.Select(x => x.GetTypeInfo().Assembly.Location)
+                .Union(GetStandardAssemblies())
+                .Distinct();
+
+            var references = locations.Select(location => MetadataReference.CreateFromFile(location));
+            var sourceTrees = sources.Select(source => CSharpSyntaxTree.ParseText(source));
             return CSharpCompilation.Create("compilation",
-                sources.Select(source => CSharpSyntaxTree.ParseText(source)),
-                new[] { MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location) },
+                sourceTrees,
+                references,
                 new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+        }
+
+        private static IEnumerable<string> GetStandardAssemblies()
+        {
+            //TODO: Replace with Assembly.Load
+            var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            var standardAssemblyNames = new[]
+            {
+                 "mscorlib.dll",
+                 "System.dll",
+                 "System.Core.dll",
+                 "System.Runtime.dll",
+                 "netstandard.dll"
+            };
+            return standardAssemblyNames.Select(x => Path.Combine(assemblyPath, x));
         }
     }
 }
