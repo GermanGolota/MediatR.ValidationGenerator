@@ -1,6 +1,8 @@
 ﻿using MediatR.ValidationGenerator.Builders;
+using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -35,38 +37,58 @@ namespace MediatR.ValidationGenerator.RuleGenerators
         public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
-            string errors = RequestValidatorCreator.VALIDATOR_ERRORS_LIST_NAME;
-            string validityFlag = RequestValidatorCreator.VALIDATOR_VALIDITY_NAME;
 
             string fullProp = $"{ param }.{ prop.Name}";
             string? errorMessage = GetCustomErrorMessageOrNull(attribute);
             if (errorMessage is null)
             {
-                errorMessage = "Empty required valued";
+                errorMessage = "\"Empty required value\"";
             }
 
-            //TODO: Generate validation based on prop type
-            body.AppendLine($"switch((object){fullProp})", endLine: false);
-            body.AppendLine("{", endLine: false);
-            List<string> cases = new List<string>()
-            {
-                "null",
-                "string s when String.IsNullOrWhiteSpace(s)",
-                "ICollection {Count: 0}",
-                "Array {Length: 0}",
-                "IEnumerable e when !e.GetEnumerator().MoveNext()"
-            };
-
-            foreach (var matchCase in cases)
-            {
-                body.AppendLine($"case {matchCase}:", 1, endLine: false);
-            }
-            body.AppendLine($"{errors}.Add(new ValidationFailure(nameof({fullProp}), \"{errorMessage}\"))", 2);
-            body.AppendLine($"{validityFlag} = false", 2);
-            body.AppendLine("break", 2);
-            body.AppendLine("}", endLine: false);
-
+            string condition = GetCondition(prop.Type, fullProp);
+            body.AppendNotEnding($"if({condition})");
+            body.AppendError($"nameof({fullProp})", errorMessage, true);
             return true;
+        }
+
+        private static string GetCondition(ITypeSymbol type, string fullProp)
+        {
+            string condition;
+            if (type.IsType("System.String"))
+            {
+                condition = $"{GlobalNames.String}.IsNullOrWhiteSpace({fullProp})";
+            }
+            else
+            {
+                string firstCondition;
+                if (type.IsValueType)
+                {
+                    string typeGlobalName = type.GetGlobalName();
+                    firstCondition = $"{fullProp}.Equals(default({typeGlobalName}))";
+                }
+                else
+                {
+                    firstCondition = $"{fullProp} == null";
+                }
+
+                string? secondCondition = null;
+                if (type.IsImplementing("ICollection", "System.Collections")
+                   || type.IsImplementing("ICollection`1", "System.Collections.Generic"))
+                {
+                    secondCondition = $"{fullProp}.Count == 0";
+                }
+                else
+                {
+                    if (type.IsImplementing("IEnumerable", "System.Collections"))
+                    {
+                        secondCondition = $"{fullProp}.GetEnumerator().MoveNext() == false";
+                    }
+                }
+                string second = secondCondition is null ? "" : $" && {secondCondition}";
+                condition = $"{firstCondition} { second }";
+            }
+
+            return condition;
         }
     }
 }

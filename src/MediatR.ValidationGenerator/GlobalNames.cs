@@ -11,5 +11,8 @@ namespace MediatR.ValidationGenerator
 
         public static readonly string ValidationFailure = "ValidationFailure"
             .GetFromGlobal(InternalNamespace);
+
+        public static readonly string String = "String"
+           .GetFromGlobal("System");
     }
 }
