@@ -3,7 +3,6 @@ using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
@@ -22,18 +21,51 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 
             string fullProp = $"{ param }.{ prop.Name}";
-            string errorMessage = "\"Empty required value\"";
+            string errorMessage = GetCustomErrorMessage(attribute) ?? "\"Empty required value\"";
 
-            string condition = GetCondition(prop.Type, fullProp);
+            bool allowEmpty = ShouldAllowEmptyStr(attribute);
+
+            string condition = GetCondition(prop.Type, fullProp, allowEmpty);
             body.AppendNotEnding($"if({condition})");
             body.AppendError($"nameof({fullProp})", errorMessage, true);
             return true;
         }
 
-        private static string GetCondition(ITypeSymbol type, string fullProp)
+        private bool ShouldAllowEmptyStr(AttributeData attribute)
+        {
+            bool allowEmpty = false;
+            foreach (var arg in attribute.NamedArguments)
+            {
+                if (arg.Key == nameof(RequiredAttribute.AllowEmptyStrings))
+                {
+                    string val = arg.Value.Value?.ToString() ?? "false";
+                    Boolean.TryParse(val, out allowEmpty);
+                }
+            }
+            return allowEmpty;
+        }
+
+        private static string? GetCustomErrorMessage(AttributeData attribute)
+        {
+            string? customErrorMessage = null;
+            var args = attribute.NamedArguments;
+            foreach (var arg in args)
+            {
+                var argName = arg.Key;
+                if (argName == nameof(RequiredAttribute.ErrorMessage))
+                {
+                    var argVal = arg.Value;
+                    customErrorMessage = argVal.Value?.ToString();
+                    break;
+                }
+            }
+            return $"\"customErrorMessage\"";
+        }
+
+        private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
         {
             string condition;
-            if (type.IsType("System.String"))
+            if (type.IsType("System.String") && allowEmpty == false)
             {
                 condition = $"{GlobalNames.String}.IsNullOrWhiteSpace({fullProp})";
             }
