@@ -13,9 +13,14 @@ namespace MediatR.ValidationGenerator.Extensions
             return type.MetadataName.GetFromGlobal(type.ContainingNamespace.MetadataName);
         }
 
+        public static string GetFullName(this ITypeSymbol type)
+        {
+            return $"{type.ContainingNamespace.MetadataName}.{type.MetadataName}";
+        }
+
         public static bool IsType(this ITypeSymbol type, string typeFullName)
         {
-            return type.MetadataName.Equals(typeFullName);
+            return type.GetFullName().Equals(typeFullName);
         }
 
         public static bool IsNotAbstract(this TypeDeclarationSyntax syntax)
