@@ -2,16 +2,17 @@
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
 {
     public class RegexRuleGenerator : IRuleGenerator
     {
-        private readonly string _requiredAttributeName = AttributeHelper.GetProperName(nameof(RegularExpressionAttribute));
+        private readonly string _regexAttributeName = nameof(RegularExpressionAttribute);
         public bool IsMatchingAttribute(AttributeData attribute)
         {
             string attributeName = attribute.AttributeClass?.Name ?? "";
-            return attributeName == _requiredAttributeName;
+            return AttributeHelper.IsTheSameAttribute(attributeName, _regexAttributeName);
         }
 
         public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
@@ -38,20 +39,27 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             return result;
         }
 
-
         private static string? GetRegex(AttributeData attribute)
         {
             string? regex = null;
-            foreach (var arg in attribute.NamedArguments)
+
+            var ctorArgs = attribute.ConstructorArguments;
+            if (ctorArgs.Count() != 0)
             {
-                if (arg.Key == nameof(RegularExpressionAttribute.Pattern))
+                regex = ctorArgs.First().Value?.ToString();
+            }
+            else
+            {
+                foreach (var arg in attribute.NamedArguments)
                 {
-                    regex = arg.Value.Value?.ToString();
-                    break;
+                    if (arg.Key == nameof(RegularExpressionAttribute.Pattern))
+                    {
+                        regex = arg.Value.Value?.ToString();
+                        break;
+                    }
                 }
             }
             return regex;
         }
-
     }
 }

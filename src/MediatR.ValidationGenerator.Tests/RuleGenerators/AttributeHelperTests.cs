@@ -12,9 +12,9 @@ namespace MediatR.ValidationGenerator.Tests.RuleGenerators
             //Arrange
             string expected = "Required";
             //Act
-            string actual = AttributeHelper.GetProperName(nameof(RequiredAttribute));
+            bool result = AttributeHelper.IsTheSameAttribute(nameof(RequiredAttribute), expected);
             //Assert
-            Assert.Equal(expected, actual);
+            Assert.True(result);
         }
     }
 }

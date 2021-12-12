@@ -2,7 +2,12 @@
 {
     public static class AttributeHelper
     {
-        public static string GetProperName(string name)
+        public static bool IsTheSameAttribute(string attributeName, string attributeName2)
+        {
+            return RemoveEndAttribute(attributeName) == RemoveEndAttribute(attributeName2);
+        }
+
+        private static string RemoveEndAttribute(string name)
         {
             string attributeStr = "Attribute";
             if (name.EndsWith(attributeStr))
