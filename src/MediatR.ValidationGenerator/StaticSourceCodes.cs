@@ -11,12 +11,12 @@ namespace {GlobalNames.InternalNamespace}
 {{
     public interface IValidator<in T>
     {{
-        ValidationResult Validate(T value);
+        {GlobalNames.ValidationResult} Validate(T value);
     }}
 
-    public class ValidationResult
+    public class {GlobalNames.ValidationResultLocal}
     {{
-        public ValidationResult(bool isValid, List<ValidationFailure> errors)
+        public {GlobalNames.ValidationResultLocal}(bool isValid, List<{GlobalNames.ValidationFailure}> errors)
         {{
             IsValid = isValid;
             Errors = errors;
@@ -28,12 +28,12 @@ namespace {GlobalNames.InternalNamespace}
         //
         // Summary:
         //     A collection of errors
-        public List<ValidationFailure> Errors {{ get; }}
+        public List<{GlobalNames.ValidationFailure}> Errors {{ get; }}
     }}
 
-    public class ValidationFailure
+    public class {GlobalNames.ValidationFailureLocal}
     {{
-        public ValidationFailure(string propertyName, string errorMessage)
+        public {GlobalNames.ValidationFailureLocal}(string propertyName, string errorMessage)
         {{
             PropertyName = propertyName;
             ErrorMessage = errorMessage;
@@ -56,18 +56,18 @@ namespace {GlobalNames.InternalNamespace}
         /// <summary>
         /// Validation errors
         /// </summary>
-        public IEnumerable<ValidationFailure> Errors {{ get; private set; }}
+        public IEnumerable<{GlobalNames.ValidationFailure}> Errors {{ get; private set; }}
 
         /// <summary>
         /// Creates a new ValidationException
         /// </summary>
         /// <param name=""errors""></param>
-        public ValidationException(IEnumerable<ValidationFailure> errors) : base(BuildErrorMessage(errors))
+        public ValidationException(IEnumerable<{GlobalNames.ValidationFailure}> errors) : base(BuildErrorMessage(errors))
         {{
             Errors = errors;
         }}
 
-        private static string BuildErrorMessage(IEnumerable<ValidationFailure> errors)
+        private static string BuildErrorMessage(IEnumerable<{GlobalNames.ValidationFailure}> errors)
         {{
             var arr = errors.Select(x => $""{{Environment.NewLine}} -- {{x.PropertyName}}: {{x.ErrorMessage}}"");
             return ""Validation failed: "" + string.Join(string.Empty, arr);
@@ -109,7 +109,7 @@ namespace {GlobalNames.InternalNamespace}
             RequestHandlerDelegate<TResponse> next
         )
         {{
-            List<ValidationFailure> failures = new List<ValidationFailure>();
+            List<{GlobalNames.ValidationFailure}> failures = new List<{GlobalNames.ValidationFailure}>();
             foreach (var validator in _validators)
             {{
                 var result = validator.Validate(request);
