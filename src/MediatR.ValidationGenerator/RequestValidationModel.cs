@@ -13,8 +13,10 @@ namespace MediatR.ValidationGenerator
         }
 
         public ITypeSymbol RequestClass { get; }
-        public Dictionary<IPropertySymbol, ImmutableArray<AttributeData>> PropertyToSupportedAttributes { get; } =
-            new Dictionary<IPropertySymbol, ImmutableArray<AttributeData>>(SymbolEqualityComparer.Default);
+        public Dictionary<IPropertySymbol, ImmutableArray<AttributeData>> PropertyToSupportedAttributes { get; }
+#pragma warning disable RS1024 // Compare symbols correctly
+            = new Dictionary<IPropertySymbol, ImmutableArray<AttributeData>>(SymbolEqualityComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
 
         public string ValidatorName => $"{RequestClass.MetadataName}Validator";
     }

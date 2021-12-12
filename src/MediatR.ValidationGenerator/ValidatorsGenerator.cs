@@ -25,7 +25,7 @@ namespace MediatR.ValidationGenerator
             });
 
             var typeDeclarations = context.SyntaxProvider
-                .CreateSyntaxProvider<TypeScanResult>(
+                .CreateSyntaxProvider(
                     static (s, _) => s is ClassDeclarationSyntax,
                     static (ctx, _) =>
                     {
@@ -45,7 +45,7 @@ namespace MediatR.ValidationGenerator
                         return result;
                     })
                 .Where(x => x is not null && x.ImplementsIRequest)
-                .Select((scanResult, _) => GetValidationModel(scanResult))
+                .Select((scanResult, _) => GetValidationModel(scanResult!))
                 .Where(x => x is not null)
                 .Select((x, _) => (x!));
 

@@ -3,10 +3,10 @@
     public struct ValueOrNull<T>
     {
         public bool IsNull { get; set; }
-        public T Value { get; set; }
+        public T? Value { get; set; }
+        public string? NullMessage { get; set; }
 
         public bool HasValue => !IsNull;
-        public string NullMessage { get; set; }
 
         public static ValueOrNull<T> CreateValue(T value)
         {
@@ -17,7 +17,7 @@
             };
         }
 
-        public static ValueOrNull<T> CreateNull(string nullMessage = null)
+        public static ValueOrNull<T> CreateNull(string? nullMessage = null)
         {
             return new ValueOrNull<T>
             {
