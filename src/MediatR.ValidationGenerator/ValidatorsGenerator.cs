@@ -1,7 +1,7 @@
-﻿using MediatR.ValidationGenerator.Models;
+﻿using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,6 +12,9 @@ namespace MediatR.ValidationGenerator
     [Generator(LanguageNames.CSharp)]
     public class ValidatorsGenerator : IIncrementalGenerator
     {
+        private static string IREQUEST_INTERFACE_NAME = "IBaseRequest";
+        private static string IREQUEST_INTERFACE_NAMESPACE = "MediatR";
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(ctx =>
@@ -29,9 +32,10 @@ namespace MediatR.ValidationGenerator
                         var info = ctx.SemanticModel.GetDeclaredSymbol(ctx.Node);
                         var type = info as ITypeSymbol;
                         TypeScanResult? result;
-                        if (type is not null && IsConcreate(type))
+                        if (type is not null && type.IsConcreate())
                         {
-                            result = new(type, IsImplementing(type));
+                            result = new(type, 
+                                type.IsImplementing(IREQUEST_INTERFACE_NAME, IREQUEST_INTERFACE_NAMESPACE));
                         }
                         else
                         {
@@ -51,18 +55,13 @@ namespace MediatR.ValidationGenerator
                 static (spc, source) => Execute(source.Left, source.Right, spc));
         }
 
-        private static bool IsConcreate(ITypeSymbol type)
-        {
-            return type.IsAbstract == false;
-        }
-
         private static RequestValidationModel? GetValidationModel(TypeScanResult scanResult)
         {
             var type = scanResult!.Type;
             RequestValidationModel? result;
             if (type is not null)
             {
-                var props = GetAllProps(type);
+                var props = type.GetAllProps();
                 if (props is not null)
                 {
                     var requestModel = new RequestValidationModel(type);
@@ -85,40 +84,6 @@ namespace MediatR.ValidationGenerator
             return result;
         }
 
-        private static List<IPropertySymbol> GetAllProps(ITypeSymbol type)
-        {
-            List<IPropertySymbol> result = type.GetMembers().OfType<IPropertySymbol>().ToList();
-
-            List<INamedTypeSymbol> baseTypes = type.Interfaces
-                .Union(new[] { type.BaseType })
-                .Where(x => x is not null)
-                .Select(x => x!)
-                .ToList();
-
-            foreach (var baseType in baseTypes)
-            {
-                result.AddRange(GetAllProps(baseType));
-            }
-
-            return result;
-        }
-
-        private static string IREQUEST_INTERFACE_NAME = "IBaseRequest";
-        private static string IREQUEST_INTERFACE_NAMESPACE = "MediatR";
-        private static bool IsImplementing(ITypeSymbol type)
-        {
-            bool isImplementing = false;
-            foreach (var interfaceType in type.AllInterfaces)
-            {
-                if (interfaceType.Name == IREQUEST_INTERFACE_NAME
-                    && interfaceType.ContainingNamespace.Name == IREQUEST_INTERFACE_NAMESPACE)
-                {
-                    isImplementing = true;
-                    break;
-                }
-            }
-            return isImplementing;
-        }
         private static void Execute(Compilation compilation,
             ImmutableArray<RequestValidationModel> validationModels,
             SourceProductionContext spc)
