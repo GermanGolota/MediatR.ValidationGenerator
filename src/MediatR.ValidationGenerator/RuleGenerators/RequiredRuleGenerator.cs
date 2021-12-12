@@ -17,33 +17,12 @@ namespace MediatR.ValidationGenerator.RuleGenerators
             return AttributeHelper.IsTheSameAttribute(attributeName, _requiredAttributeName);
         }
 
-        private static string? GetCustomErrorMessageOrNull(AttributeData attribute)
-        {
-            string? customErrorMessage = null;
-            var args = attribute.NamedArguments;
-            foreach (var arg in args)
-            {
-                var argName = arg.Key;
-                if (argName == "ErrorMessage")
-                {
-                    var argVal = arg.Value;
-                    customErrorMessage = argVal.Value?.ToString();
-                    break;
-                }
-            }
-            return customErrorMessage;
-        }
-
         public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 
             string fullProp = $"{ param }.{ prop.Name}";
-            string? errorMessage = GetCustomErrorMessageOrNull(attribute);
-            if (errorMessage is null)
-            {
-                errorMessage = "\"Empty required value\"";
-            }
+            string errorMessage = "\"Empty required value\"";
 
             string condition = GetCondition(prop.Type, fullProp);
             body.AppendNotEnding($"if({condition})");
