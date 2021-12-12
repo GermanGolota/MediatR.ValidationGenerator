@@ -2,11 +2,24 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <!--Uncomment to emit generate sources-->
+    <!--
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(MSBuildThisFileDirectory)\Generated</CompilerGeneratedFilesOutputPath>
+    -->
   </PropertyGroup>
 
+  <ItemGroup>
+    <!--Workaround until newer versions of vs include this package by default-->
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+  
   <!--TODO: get from nuget-->
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <ProjectReference Include="..\..\src\MediatR.ValidationGenerator\MediatR.ValidationGenerator.csproj" PrivateAssets="all" OutputItemType="Analyzer" />
   </ItemGroup>
 </Project>
