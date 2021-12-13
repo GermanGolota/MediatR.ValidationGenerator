@@ -111,14 +111,14 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
 
-        public ValueOrNull<string> Build()
+        public string Build()
         {
             string signature = BuildSignature();
-            var bodyResult = GetBody().Build();
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(signature);
-            bodyResult.Resolve(body => sb.Append(body));
+            var body = GetBody().Build();
+            sb.Append(body);
 
             return sb.ToString();
         }

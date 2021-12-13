@@ -111,12 +111,7 @@ namespace MediatR.ValidationGenerator.Builders
             string result = "";
             if (_constructor.IsNotNull())
             {
-                var buildResult = _constructor.Build();
-                result = buildResult.Resolve(
-                    x => x,
-                    //TODO: report errors
-                    _ => ""
-                    );
+                result = _constructor.Build();
             }
             return result;
         }
@@ -127,18 +122,7 @@ namespace MediatR.ValidationGenerator.Builders
             StringBuilder classBodyBuilder = new StringBuilder();
             foreach (var method in methods)
             {
-                var methodBuildResult = method.Build();
-                methodBuildResult.Resolve(
-                methodStr =>
-                {
-                    classBodyBuilder.Append(methodStr);
-                },
-                //TODO: report errors
-                _ => { }
-                );
-                if (methodBuildResult.HasValue)
-                {
-                }
+                classBodyBuilder.Append(method.Build());
             }
             return classBodyBuilder.ToString();
         }
@@ -171,7 +155,7 @@ namespace MediatR.ValidationGenerator.Builders
             return namespaceBuilder.ToString();
         }
 
-        public ValueOrNull<string> Build()
+        public string Build()
         {
             StringBuilder classBuilder = new StringBuilder();
 

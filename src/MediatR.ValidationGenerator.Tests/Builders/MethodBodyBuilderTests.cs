@@ -24,7 +24,6 @@ namespace MediatR.ValidationGenerator.Tests.Builders
 
             var actualBody = builder.Build();
             //Assert
-            Assert.True(actualBody.HasValue);
             Assert.Equal(expectedBody, actualBody);
         }
     }

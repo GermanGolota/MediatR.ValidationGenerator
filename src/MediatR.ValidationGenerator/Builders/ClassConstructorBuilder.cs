@@ -78,14 +78,14 @@ namespace MediatR.ValidationGenerator.Builders
         }
         #endregion
 
-        public ValueOrNull<string> Build()
+        public string Build()
         {
             StringBuilder constructorBuilder = new StringBuilder();
             string signature = BuildSignature();
             constructorBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             constructorBuilder.AppendLine(signature);
-            var bodyResult = GetBody().Build();
-            bodyResult.Resolve(body => constructorBuilder.Append(body));
+            var body = GetBody().Build();
+            constructorBuilder.Append(body);
             return constructorBuilder.ToString();
         }
 
