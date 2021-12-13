@@ -9,11 +9,11 @@ namespace MediatR.ValidationGenerator.Tests.Builders
         public void Build_ShouldBuild()
         {
             //Arrange
-            var builder = new ClassBuilder()
-                .UsingNamespace("System")
-                .WithNamespace("TestNamespace")
-                .WithAccessModifier(AccessModifier.Public)
+            var builder = ClassBuilder.Create()
                 .WithClassName("Test")
+                .WithNamespace("TestNamespace")
+                .UsingNamespace("System")
+                .WithAccessModifier(AccessModifier.Public)
                 .WithMethod((builder) =>
                 {
                     return builder

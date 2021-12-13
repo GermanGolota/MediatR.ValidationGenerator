@@ -22,7 +22,7 @@ namespace MediatR.ValidationGenerator.Builders
     {
         IClassBuilder WithAccessModifier(AccessModifier modifier);
         IClassBuilder WithMethod(Func<MethodBuilder, MethodBuilder> methodBuilder);
-        IClassBuilder WithConstructor(Func<ClassConstructorBuilder, ClassConstructorBuilder> constructorBuilder);
+        IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder);
         IClassBuilder UsingNamespace(string usedNamespace);
         IClassBuilder Implementing(string className);
     }
@@ -43,7 +43,7 @@ namespace MediatR.ValidationGenerator.Builders
         private List<string> _usedNamespaces = new List<string>();
 
         private List<MethodBuilder> _methods = new List<MethodBuilder>();
-        private ClassConstructorBuilder _constructor;
+        private IClassConstructorBuilder _constructor;
 
         private string _className;
         private AccessModifier _modifier = AccessModifier.Public;
@@ -71,9 +71,9 @@ namespace MediatR.ValidationGenerator.Builders
             _methods.Add(method);
             return this;
         }
-        public IClassBuilder WithConstructor(Func<ClassConstructorBuilder, ClassConstructorBuilder> constructorBuilder)
+        public IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder)
         {
-            var initalCtor = new ClassConstructorBuilder(2)
+            IClassConstructorBuilder initalCtor = ClassConstructorBuilder.Create(2)
                 .WithClassName(_className);
             _constructor = constructorBuilder(initalCtor);
             return this;

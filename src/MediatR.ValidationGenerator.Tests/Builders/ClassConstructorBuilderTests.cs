@@ -9,7 +9,7 @@ namespace MediatR.ValidationGenerator.Tests.Builders
         public void Build_ShouldBuild_WhenClassNameIsProvided()
         {
             //Arrange
-            var constructorBuilder = new ClassConstructorBuilder()
+            var constructorBuilder = ClassConstructorBuilder.Create()
                                         .WithClassName("Test")
                                         .WithParameter("int", "margin")
                                         .WithModifier(AccessModifier.Public)

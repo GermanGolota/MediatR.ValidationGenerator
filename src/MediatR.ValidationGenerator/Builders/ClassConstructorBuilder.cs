@@ -7,10 +7,22 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Builders
 {
-    public class ClassConstructorBuilder : ValidatingBuilder
+    public interface IClassConstructorClassNameSelector
+    {
+        IClassConstructorBuilder WithClassName(string className);
+    }
+
+    public interface IClassConstructorBuilder : IBuilder
+    {
+        IClassConstructorBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder);
+        IClassConstructorBuilder WithModifier(AccessModifier modifier);
+        IClassConstructorBuilder WithParameter(string parameterType, string parameterName);
+    }
+
+    public class ClassConstructorBuilder : IClassConstructorBuilder, IClassConstructorClassNameSelector
     {
         #region Data
-        private int _leftMargin = 0;
+        private int _leftMargin;
         private string _className;
 
         private AccessModifier _modifier = AccessModifier.Public;
@@ -29,43 +41,36 @@ namespace MediatR.ValidationGenerator.Builders
 
         #endregion
 
-        public ClassConstructorBuilder()
+        public static IClassConstructorClassNameSelector Create(int margin = 0)
         {
-
+            return new ClassConstructorBuilder(margin);
         }
 
-        public ClassConstructorBuilder(int margin)
+        private ClassConstructorBuilder(int margin)
         {
             _leftMargin = margin;
         }
 
         #region BuildAccessors
-        public ClassConstructorBuilder WithClassName(string className)
+        public IClassConstructorBuilder WithClassName(string className)
         {
             _className = className;
             return this;
         }
 
-        public ClassConstructorBuilder WithMargin(int margin)
-        {
-            _leftMargin = margin;
-            return this;
-        }
-
-
-        public ClassConstructorBuilder WithModifier(AccessModifier modifier)
+        public IClassConstructorBuilder WithModifier(AccessModifier modifier)
         {
             _modifier = modifier;
             return this;
         }
 
-        public ClassConstructorBuilder WithParameter(string parameterType, string parameterName)
+        public IClassConstructorBuilder WithParameter(string parameterType, string parameterName)
         {
             _parameters.Add(new MethodParameter(parameterType, parameterName));
             return this;
         }
 
-        public ClassConstructorBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
+        public IClassConstructorBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
         {
             var initial = new MethodBodyBuilder(_leftMargin);
             _body = builder(initial);
@@ -73,21 +78,7 @@ namespace MediatR.ValidationGenerator.Builders
         }
         #endregion
 
-        public override SuccessOrFailure Validate()
-        {
-            SuccessOrFailure result;
-            if (_className.IsEmpty())
-            {
-                result = SuccessOrFailure.CreateFailure("Cannot create constructor without class name");
-            }
-            else
-            {
-                result = true;
-            }
-            return result;
-        }
-
-        protected override string BuildInner()
+        public ValueOrNull<string> Build()
         {
             StringBuilder constructorBuilder = new StringBuilder();
             string signature = BuildSignature();
