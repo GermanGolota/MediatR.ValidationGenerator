@@ -4,6 +4,6 @@ namespace MediatR.ValidationGenerator.Builders.Abstractions
 {
     public interface IBuilder
     {
-        public ValueOrNull<string> Build();
+        public string Build();
     }
 }

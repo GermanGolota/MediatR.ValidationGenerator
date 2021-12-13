@@ -18,8 +18,8 @@ namespace MediatR.ValidationGenerator
             string requestNamespace = model.RequestClass.ContainingNamespace.ToDisplayString();
             string requestGlobalName = requestClassName.GetFromGlobal(requestNamespace);
 
-            var classBuilder = new ClassBuilder()
-                     .WithClassName($"{model.ValidatorName}")
+            var classBuilder = ClassBuilder.Create()
+                     .WithClassName(model.ValidatorName)
                      .WithNamespace(VALIDATORS_NAMESPACE)
                      .Implementing($"{GlobalNames.InternalNamespace}.IValidator<{requestGlobalName}>")
                      .WithMethod(method =>

@@ -9,7 +9,7 @@ namespace MediatR.ValidationGenerator.Tests.Builders
         public void Build_ShouldBuild_WhenClassNameIsProvided()
         {
             //Arrange
-            var constructorBuilder = new ClassConstructorBuilder()
+            var constructorBuilder = ClassConstructorBuilder.Create()
                                         .WithClassName("Test")
                                         .WithParameter("int", "margin")
                                         .WithModifier(AccessModifier.Public)
@@ -25,13 +25,9 @@ public Test(int margin)
 }
 ".RemoveFirstNewLine();
             //Act
-            var actualResult = constructorBuilder.Build();
+            var actual = constructorBuilder.Build();
             //Assert
-            actualResult.Resolve(
-               actual => Assert.Equal(expected, actual),
-               //should not get called
-               _ => Assert.True(false)
-               );
+            Assert.Equal(expected, actual);
         }
     }
 }

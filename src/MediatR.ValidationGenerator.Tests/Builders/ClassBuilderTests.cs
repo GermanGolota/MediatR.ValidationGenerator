@@ -9,17 +9,17 @@ namespace MediatR.ValidationGenerator.Tests.Builders
         public void Build_ShouldBuild()
         {
             //Arrange
-            var builder = new ClassBuilder()
-                .UsingNamespace("System")
-                .WithNamespace("TestNamespace")
-                .WithAccessModifier(AccessModifier.Public)
+            var builder = ClassBuilder.Create()
                 .WithClassName("Test")
+                .WithNamespace("TestNamespace")
+                .UsingNamespace("System")
+                .WithAccessModifier(AccessModifier.Public)
                 .WithMethod((builder) =>
                 {
                     return builder
-                        .WithModifier(AccessModifier.Public)
                         .WithName("DoNothing")
-                        .WithReturnType("void");
+                        .WithReturnType("void")
+                        .WithModifier(AccessModifier.Public);
                 });
             string expectedClass = @"
 using System;
@@ -37,11 +37,7 @@ namespace TestNamespace
             //Act
             var actualClass = builder.Build();
             //Assert
-            actualClass.Resolve(
-                classStr => Assert.Equal(expectedClass, classStr),
-                //should not get called
-                _ => Assert.True(false)
-                );
+            Assert.Equal(expectedClass, actualClass);
         }
     }
 }

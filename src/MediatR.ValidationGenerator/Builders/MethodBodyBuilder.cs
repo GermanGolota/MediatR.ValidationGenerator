@@ -33,7 +33,7 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
 
-        public ValueOrNull<string> Build()
+        public string Build()
         {
             StringBuilder sb = new StringBuilder();
             AppendMargin(sb, _initialLeftMargin);
