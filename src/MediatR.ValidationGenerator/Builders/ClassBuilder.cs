@@ -29,14 +29,15 @@ namespace MediatR.ValidationGenerator.Builders
 
     public class ClassBuilder : IClassNameSpaceSelector, IClassNameSelector, IClassBuilder
     {
-        private ClassBuilder()
-        {
-
-        }
 
         public static IClassNameSelector Create()
         {
             return new ClassBuilder();
+        }
+
+        private ClassBuilder()
+        {
+
         }
 
         private List<string> _implementsList = new List<string>();

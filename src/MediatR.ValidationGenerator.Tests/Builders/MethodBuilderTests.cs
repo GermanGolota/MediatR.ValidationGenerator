@@ -10,10 +10,10 @@ namespace MediatR.ValidationGenerator.Tests.Builders
         public void Build_ShouldCreateMethod_WhenTypeAndNameAreProvided()
         {
             //Arrange
-            var builder = new MethodBuilder()
-                .WithModifier(AccessModifier.Public)
-                .WithReturnType("int")
+            var builder = MethodBuilder.Create()
                 .WithName("Sum")
+                .WithReturnType("int")
+                .WithModifier(AccessModifier.Public)
                 .WithParameter("int", "a")
                 .WithParameter("int", "b")
                 .WithBody((body) =>
@@ -37,32 +37,6 @@ public int Sum(int a, int b)
                //should not get called
                _ => Assert.True(false)
                );
-        }
-
-        [Fact]
-        public void Build_ShouldNotCreateMethod_WhenNoNameIsProvided()
-        {
-            //Arrange
-            var builder = new MethodBuilder()
-                .WithModifier(AccessModifier.Public)
-                .WithReturnType("void");
-            //Act
-            ValueOrNull<string> result = builder.Build();
-            //Assert
-            Assert.True(result.IsNull);
-        }
-
-        [Fact]
-        public void Build_ShouldNotCreateMethod_WhenNoReturnTypeIsProvided()
-        {
-            //Arrange
-            var builder = new MethodBuilder()
-                .WithModifier(AccessModifier.Public)
-                .WithName("DoNothing");
-            //Act
-            ValueOrNull<string> result = builder.Build();
-            //Assert
-            Assert.True(result.IsNull);
         }
     }
 }

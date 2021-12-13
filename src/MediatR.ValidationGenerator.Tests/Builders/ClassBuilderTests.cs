@@ -17,9 +17,9 @@ namespace MediatR.ValidationGenerator.Tests.Builders
                 .WithMethod((builder) =>
                 {
                     return builder
-                        .WithModifier(AccessModifier.Public)
                         .WithName("DoNothing")
-                        .WithReturnType("void");
+                        .WithReturnType("void")
+                        .WithModifier(AccessModifier.Public);
                 });
             string expectedClass = @"
 using System;
