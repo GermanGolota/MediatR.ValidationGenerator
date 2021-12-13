@@ -21,7 +21,7 @@ namespace MediatR.ValidationGenerator.Builders
     public interface IClassBuilder : IBuilder
     {
         IClassBuilder WithAccessModifier(AccessModifier modifier);
-        IClassBuilder WithMethod(Func<MethodBuilder, MethodBuilder> methodBuilder);
+        IClassBuilder WithMethod(Func<IMethodNameSelector, IMethodBuilder> methodBuilder);
         IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder);
         IClassBuilder UsingNamespace(string usedNamespace);
         IClassBuilder Implementing(string className);
@@ -42,7 +42,7 @@ namespace MediatR.ValidationGenerator.Builders
         private List<string> _implementsList = new List<string>();
         private List<string> _usedNamespaces = new List<string>();
 
-        private List<MethodBuilder> _methods = new List<MethodBuilder>();
+        private List<IMethodBuilder> _methods = new List<IMethodBuilder>();
         private IClassConstructorBuilder _constructor;
 
         private string _className;
@@ -64,9 +64,9 @@ namespace MediatR.ValidationGenerator.Builders
             _modifier = modifier;
             return this;
         }
-        public IClassBuilder WithMethod(Func<MethodBuilder, MethodBuilder> methodBuilder)
+        public IClassBuilder WithMethod(Func<IMethodNameSelector, IMethodBuilder> methodBuilder)
         {
-            MethodBuilder initial = new MethodBuilder(2);
+            var initial = MethodBuilder.Create(2);
             var method = methodBuilder(initial);
             _methods.Add(method);
             return this;
@@ -121,7 +121,7 @@ namespace MediatR.ValidationGenerator.Builders
         }
 
         [Pure]
-        private string BuildMethods(List<MethodBuilder> methods)
+        private string BuildMethods(List<IMethodBuilder> methods)
         {
             StringBuilder classBodyBuilder = new StringBuilder();
             foreach (var method in methods)

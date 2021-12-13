@@ -7,7 +7,27 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Builders
 {
-    public class MethodBuilder : ValidatingBuilder
+    public interface IMethodNameSelector
+    {
+        IMethodReturnTypeSelector WithName(string name);
+    }
+
+    public interface IMethodReturnTypeSelector
+    {
+        IMethodBuilder WithReturnType(string type);
+    }
+
+    public interface IMethodBuilder : IBuilder
+    {
+        IMethodBuilder AsOverride();
+        IMethodBuilder AsStatic();
+        IMethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder);
+        IMethodBuilder WithModifier(AccessModifier modifier);
+        IMethodBuilder WithParameter(string type, string parameterName);
+        IMethodBuilder WithParameter(string type, string parameterName, string defaultValue);
+    }
+
+    public class MethodBuilder : IMethodBuilder, IMethodReturnTypeSelector, IMethodNameSelector
     {
         private int _leftMargin;
 
@@ -30,36 +50,30 @@ namespace MediatR.ValidationGenerator.Builders
             return _body;
         }
 
-        public MethodBuilder()
+        public static IMethodNameSelector Create(int margin = 0)
         {
-            _leftMargin = 0;
+            return new MethodBuilder(margin);
         }
 
-        public MethodBuilder(int margin)
-        {
-            _leftMargin = margin;
-        }
-
-        public MethodBuilder WithMargin(int margin)
+        private MethodBuilder(int margin)
         {
             _leftMargin = margin;
-            return this;
         }
 
-        public MethodBuilder IncreaseMargin(int margin)
-        {
-            _leftMargin += margin;
-            return this;
-        }
-
-        public MethodBuilder WithName(string name)
+        public IMethodReturnTypeSelector WithName(string name)
         {
             _methodName = name;
 
             return this;
         }
 
-        public MethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
+        public IMethodBuilder WithReturnType(string type)
+        {
+            _returnType = type;
+            return this;
+        }
+
+        public IMethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder)
         {
             var body = new MethodBodyBuilder(_leftMargin);
             body = builder(body);
@@ -67,64 +81,37 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
 
-        public MethodBuilder WithReturnType(string type)
-        {
-            _returnType = type;
-            return this;
-        }
-
-        public MethodBuilder WithParameter(string type, string parameterName)
+        public IMethodBuilder WithParameter(string type, string parameterName)
         {
             _parameters.Add(new MethodParameter(type, parameterName));
             return this;
         }
 
-        public MethodBuilder WithParameter(string type, string parameterName, string defaultValue)
+        public IMethodBuilder WithParameter(string type, string parameterName, string defaultValue)
         {
             _parameters.Add(new MethodParameter(type, parameterName, defaultValue));
             return this;
         }
 
-        public MethodBuilder AsOverride()
+        public IMethodBuilder AsOverride()
         {
             _isOverride = true;
             return this;
         }
 
-        public MethodBuilder AsStatic()
+        public IMethodBuilder AsStatic()
         {
             _isStatic = true;
             return this;
         }
 
-        public MethodBuilder WithModifier(AccessModifier modifier)
+        public IMethodBuilder WithModifier(AccessModifier modifier)
         {
             _modifier = modifier;
             return this;
         }
 
-        public override SuccessOrFailure Validate()
-        {
-            SuccessOrFailure result;
-            if (_methodName.IsEmpty())
-            {
-                result = SuccessOrFailure.CreateFailure("Can't create method with no name");
-            }
-            else
-            {
-                if (_returnType.IsEmpty())
-                {
-                    result = SuccessOrFailure.CreateFailure("Can't create method with no return type");
-                }
-                else
-                {
-                    result = true;
-                }
-            }
-            return result;
-        }
-
-        protected override string BuildInner()
+        public ValueOrNull<string> Build()
         {
             string signature = BuildSignature();
             var bodyResult = GetBody().Build();
