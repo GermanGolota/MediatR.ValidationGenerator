@@ -2,6 +2,6 @@
 {
     public enum AccessModifier
     {
-        Public, Private, Protected
+        Public, Private, Protected, Internal
     }
 }

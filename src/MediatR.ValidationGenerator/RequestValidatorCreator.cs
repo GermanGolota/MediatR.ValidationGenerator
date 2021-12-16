@@ -11,7 +11,6 @@ namespace MediatR.ValidationGenerator
         public static readonly string VALIDATOR_ERRORS_LIST_NAME = "failures";
         public static readonly string VALIDATOR_VALIDITY_NAME = "isValid";
 
-        public static readonly string VALIDATORS_NAMESPACE = "Validators.Generated";
         public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
         {
             string requestClassName = model.RequestClass.MetadataName;
@@ -20,8 +19,8 @@ namespace MediatR.ValidationGenerator
 
             var classBuilder = ClassBuilder.Create()
                      .WithClassName(model.ValidatorName)
-                     .WithNamespace(VALIDATORS_NAMESPACE)
-                     .Implementing($"{GlobalNames.InternalNamespace}.IValidator<{requestGlobalName}>")
+                     .WithNamespace(GlobalNames.ValidatorsNamespace)
+                     .Implementing($"{GlobalNames.Validator}<{requestGlobalName}>")
                      .WithMethod(method =>
                      {
                          return method.WithName(VALIDATE_METHOD_NAME)

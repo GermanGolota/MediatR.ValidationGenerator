@@ -10,7 +10,7 @@ namespace MediatR.ValidationGenerator.Extensions
     {
         public static string GetGlobalName(this ITypeSymbol type)
         {
-            return type.MetadataName.GetFromGlobal(type.ContainingNamespace.MetadataName);
+            return type.MetadataName.GetFromGlobal(type.ContainingNamespace.ToDisplayString());
         }
 
         public static string GetFullName(this ITypeSymbol type)

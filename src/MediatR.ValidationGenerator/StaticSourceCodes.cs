@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 
 namespace {GlobalNames.InternalNamespace}
 {{
-    public interface IValidator<in T>
+    public interface {GlobalNames.ValidatorLocal}<in T>
     {{
         {GlobalNames.ValidationResult} Validate(T value);
     }}
@@ -97,9 +97,9 @@ namespace {GlobalNames.InternalNamespace}
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
          where TRequest : IRequest<TResponse>
     {{
-        private readonly IEnumerable<IValidator<TRequest>> _validators;
+        private readonly IEnumerable<{GlobalNames.Validator}<TRequest>> _validators;
 
-        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+        public ValidationBehavior(IEnumerable<{GlobalNames.Validator}<TRequest>> validators)
         {{
             _validators = validators;
         }}
@@ -234,7 +234,7 @@ namespace MediatR.ValidationGenerator
 
             private IEnumerable<AssemblyScanResult> Execute()
             {{
-                var openGenericType = typeof(IValidator<>);
+                var openGenericType = typeof({GlobalNames.Validator}<>);
 
                 var query = _types.Where(type => (type.IsAbstract || type.IsGenericTypeDefinition) == false)
                     .Select(type =>
@@ -303,6 +303,17 @@ namespace MediatR.ValidationGenerator
                 public Type ValidatorType {{ get; private set; }}
             }}
         }}
+    }}
+}}
+
+namespace {GlobalNames.InternalNamespace}
+{{
+    //partial class for registrations that would get populated in generated second part of this class
+    internal partial class {GlobalNames.DIRegistrationsLocal}
+    {{
+        //interface to implementation
+        public {GlobalNames.Dictionary}<{GlobalNames.Type},{GlobalNames.Type}> {GlobalNames.DIRegistrationsDict} {{ get; }} 
+                = new {GlobalNames.Dictionary}<{GlobalNames.Type},{GlobalNames.Type}>();
     }}
 }}
 ";
