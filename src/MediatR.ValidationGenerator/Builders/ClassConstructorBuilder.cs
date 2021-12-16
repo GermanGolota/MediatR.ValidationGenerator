@@ -3,6 +3,7 @@ using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Text;
 
 namespace MediatR.ValidationGenerator.Builders
@@ -21,26 +22,6 @@ namespace MediatR.ValidationGenerator.Builders
 
     public class ClassConstructorBuilder : IClassConstructorBuilder, IClassConstructorClassNameSelector
     {
-        #region Data
-        private int _leftMargin;
-        private string _className;
-
-        private AccessModifier _modifier = AccessModifier.Public;
-        private List<MethodParameter> _parameters = new List<MethodParameter>();
-
-        private MethodBodyBuilder _body;
-
-        private MethodBodyBuilder GetBody()
-        {
-            if (_body is null)
-            {
-                _body = new MethodBodyBuilder(_leftMargin);
-            }
-            return _body;
-        }
-
-        #endregion
-
         public static IClassConstructorClassNameSelector Create(int margin = 0)
         {
             return new ClassConstructorBuilder(margin);
@@ -51,7 +32,25 @@ namespace MediatR.ValidationGenerator.Builders
             _leftMargin = margin;
         }
 
-        #region BuildAccessors
+        #region DataFields
+        //Required
+        private string _className = null!;
+        //Optional
+        private MethodBodyBuilder? _body = null;
+        private MethodBodyBuilder GetBody()
+        {
+            if (_body is null)
+            {
+                _body = new MethodBodyBuilder(_leftMargin);
+            }
+            return _body;
+        }
+
+        private int _leftMargin;
+        private AccessModifier _modifier = AccessModifier.Public;
+        private List<MethodParameter> _parameters = new List<MethodParameter>();
+        #endregion
+        #region AccessMethods
         public IClassConstructorBuilder WithClassName(string className)
         {
             _className = className;
@@ -77,11 +76,11 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
         #endregion
-
+        #region Build
         public string Build()
         {
             StringBuilder constructorBuilder = new StringBuilder();
-            string signature = BuildSignature();
+            string signature = BuildSignature(_modifier, _className, _parameters);
             constructorBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             constructorBuilder.AppendLine(signature);
             var body = GetBody().Build();
@@ -89,11 +88,13 @@ namespace MediatR.ValidationGenerator.Builders
             return constructorBuilder.ToString();
         }
 
-        private string BuildSignature()
+        [Pure]
+        private static string BuildSignature(AccessModifier modifier, string className, List<MethodParameter> parametersList)
         {
-            string signature = $"{_modifier.ToString().ToLower()} {_className}";
-            string parameters = BuilderUtils.BuildParameterList(_parameters);
+            string signature = $"{modifier.ToString().ToLower()} {className}";
+            string parameters = BuilderUtils.BuildParameterList(parametersList);
             return $"{signature}({parameters})";
         }
+        #endregion
     }
 }

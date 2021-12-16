@@ -1,5 +1,4 @@
 ﻿using MediatR.ValidationGenerator.Extensions;
-using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -101,9 +100,12 @@ namespace MediatR.ValidationGenerator
                 {
                     Diagnostic error = CreateDiagnostic(validationModel, errorMsg);
                     errors.Add(error);
-
                 });
             }
+
+            var (fileName, src) = RegistrationsCreator.CreateFor(validationModels);
+            spc.AddSource(src, fileName);
+
             foreach (var error in errors)
             {
                 spc.ReportDiagnostic(error);

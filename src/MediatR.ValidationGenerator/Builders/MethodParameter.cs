@@ -13,8 +13,8 @@
             DefaultValue = defaultValue;
         }
 
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public string DefaultValue { get; set; }
+        public string Type { get; }
+        public string Name { get; }
+        public string? DefaultValue { get; } = null;
     }
 }

@@ -14,7 +14,7 @@ namespace MediatR.ValidationGenerator.Builders
             foreach (var parameter in parameters)
             {
                 string parameterStr = $"{parameter.Type} {parameter.Name}";
-                if (parameter.DefaultValue.IsNotEmpty())
+                if (parameter.DefaultValue is not null)
                 {
                     parameterStr += $" = {parameter.DefaultValue}";
                 }
