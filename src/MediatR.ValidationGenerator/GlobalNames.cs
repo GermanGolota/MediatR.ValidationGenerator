@@ -40,5 +40,8 @@ namespace MediatR.ValidationGenerator
           .GetFromGlobal(nameof(System));
 
         public static readonly string ValidatorsNamespace = "Validators.Generated";
+
+        public static readonly string ServiceDescriptor = "ServiceDescriptor"
+            .GetFromGlobal("Microsoft.Extensions.DependencyInjection");
     }
 }

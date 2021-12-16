@@ -15,7 +15,7 @@ namespace ExampleApp
             //MediatR
             var assemblies = new[] { typeof(Startup).Assembly };
             services.AddMediatR(assemblies);
-            services.AddGeneratedValidators(assemblies);
+            services.AddGeneratedValidators();
             //
 
             services.AddControllers();
