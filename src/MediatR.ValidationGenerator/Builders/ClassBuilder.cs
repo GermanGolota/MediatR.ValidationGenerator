@@ -20,6 +20,7 @@ namespace MediatR.ValidationGenerator.Builders
 
     public interface IClassBuilder : IBuilder
     {
+        IClassBuilder AsPartial();
         IClassBuilder WithAccessModifier(AccessModifier modifier);
         IClassBuilder WithMethod(Func<IMethodNameSelector, IMethodBuilder> methodBuilder);
         IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder);
@@ -42,6 +43,8 @@ namespace MediatR.ValidationGenerator.Builders
 
         private List<string> _implementsList = new List<string>();
         private List<string> _usedNamespaces = new List<string>();
+
+        private bool _isPartial = false;
 
         private List<IMethodBuilder> _methods = new List<IMethodBuilder>();
         private IClassConstructorBuilder _constructor;
@@ -92,10 +95,16 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
 
+        public IClassBuilder AsPartial()
+        {
+            _isPartial = true;
+            return this;
+        }
+
         private string BuildClassBody()
         {
             StringBuilder classBodyBuilder = new StringBuilder();
-            string signature = BuildSignature(_modifier, _className, _implementsList);
+            string signature = BuildSignature(_modifier, _className, _implementsList, _isPartial);
             classBodyBuilder.AppendLine($"{BuilderUtils.TAB}{signature}");
             classBodyBuilder.AppendLine(BuilderUtils.TAB + "{");
             var ctor = BuildConstructor();
@@ -128,15 +137,22 @@ namespace MediatR.ValidationGenerator.Builders
         }
 
         [Pure]
-        private string BuildSignature(AccessModifier modifier, string nameOfClass, List<string> implementsList)
+        private string BuildSignature(AccessModifier modifier, string nameOfClass, List<string> implementsList, bool isPartial)
         {
-            string className = $"{modifier.ToString().ToLower()} class {nameOfClass}";
-            string implements = "";
+            StringBuilder signatureBuilder = new StringBuilder();
+            string modifierStr = modifier.ToString().ToLower();
+            signatureBuilder.Append(modifierStr);
+            if (isPartial)
+            {
+                signatureBuilder.Append(" partial");
+            }
+            signatureBuilder.Append($" class {nameOfClass}");
             if (_implementsList.Count > 0)
             {
-                implements = $" : {string.Join(",", implementsList)}";
+                string implements = $" : {string.Join(",", implementsList)}";
+                signatureBuilder.Append(implements);
             }
-            return $"{className}{implements}";
+            return signatureBuilder.ToString();
         }
 
         [Pure]
