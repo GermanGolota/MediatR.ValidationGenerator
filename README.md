@@ -14,7 +14,7 @@ Add validators to DI container with AddGeneratedValidators </br> </br>
   {
     var assemblies = new[] { typeof(Startup).Assembly };
     services.AddMediatR(assemblies);
-    services.AddGeneratedValidators(assemblies);
+    services.AddGeneratedValidators();
   }
 ```
 Add attributes from list of <a href="#2">supported attributes </a> to request models
