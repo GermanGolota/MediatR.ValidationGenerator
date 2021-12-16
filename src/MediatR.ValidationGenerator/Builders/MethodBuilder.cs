@@ -29,27 +29,6 @@ namespace MediatR.ValidationGenerator.Builders
 
     public class MethodBuilder : IMethodBuilder, IMethodReturnTypeSelector, IMethodNameSelector
     {
-        private int _leftMargin;
-
-        private bool _isOverride = false;
-        private bool _isStatic = false;
-
-        private string _returnType;
-        private string _methodName;
-        private AccessModifier _modifier = AccessModifier.Public;
-
-        private List<MethodParameter> _parameters = new List<MethodParameter>();
-
-        private MethodBodyBuilder _body;
-        private MethodBodyBuilder GetBody()
-        {
-            if (_body is null)
-            {
-                _body = new MethodBodyBuilder(_leftMargin);
-            }
-            return _body;
-        }
-
         public static IMethodNameSelector Create(int margin = 0)
         {
             return new MethodBuilder(margin);
@@ -60,6 +39,30 @@ namespace MediatR.ValidationGenerator.Builders
             _leftMargin = margin;
         }
 
+        #region DataFields
+        //Required
+        private string _returnType = null!;
+        private string _methodName = null!;
+        //Optional
+        private int _leftMargin;
+        private bool _isOverride = false;
+        private bool _isStatic = false;
+
+        private AccessModifier _modifier = AccessModifier.Public;
+
+        private List<MethodParameter> _parameters = new List<MethodParameter>();
+
+        private MethodBodyBuilder? _body = null;
+        private MethodBodyBuilder GetBody()
+        {
+            if (_body is null)
+            {
+                _body = new MethodBodyBuilder(_leftMargin);
+            }
+            return _body;
+        }
+        #endregion
+        #region AccessMethods
         public IMethodReturnTypeSelector WithName(string name)
         {
             _methodName = name;
@@ -110,7 +113,8 @@ namespace MediatR.ValidationGenerator.Builders
             _modifier = modifier;
             return this;
         }
-
+        #endregion
+        #region Build
         public string Build()
         {
             string signature = BuildSignature();
@@ -131,26 +135,12 @@ namespace MediatR.ValidationGenerator.Builders
             signatureBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
             signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{_returnType} {_methodName}");
             signatureBuilder.Append("(");
-            string parameterStr = BuildParameters();
+            string parameterStr = BuilderUtils.BuildParameterList(_parameters);
             signatureBuilder.Append(parameterStr);
             signatureBuilder.Append(")");
             string signature = signatureBuilder.ToString();
             return signature;
         }
-
-        private string BuildParameters()
-        {
-            List<string> parameters = new List<string>();
-            foreach (var parameter in _parameters)
-            {
-                string parameterStr = $"{parameter.Type} {parameter.Name}";
-                if (parameter.DefaultValue.IsNotEmpty())
-                {
-                    parameterStr += $" = {parameter.DefaultValue}";
-                }
-                parameters.Add(parameterStr);
-            }
-            return string.Join(", ", parameters);
-        }
+        #endregion
     }
 }
