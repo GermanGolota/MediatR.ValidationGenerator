@@ -1,6 +1,8 @@
 ﻿using MediatR.ValidationGenerator.Builders;
-using MediatR.ValidationGenerator.Models;
 using MediatR.ValidationGenerator.Extensions;
+using MediatR.ValidationGenerator.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MediatR.ValidationGenerator
 {
@@ -11,12 +13,13 @@ namespace MediatR.ValidationGenerator
         public static readonly string VALIDATOR_ERRORS_LIST_NAME = "failures";
         public static readonly string VALIDATOR_VALIDITY_NAME = "isValid";
 
-        public static ValueOrNull<string> CreateValidatorFor(RequestValidationModel model)
+        public static (string sourceCode, List<string> failures) CreateValidatorFor(RequestValidationModel model)
         {
             string requestClassName = model.RequestClass.MetadataName;
             string requestNamespace = model.RequestClass.ContainingNamespace.ToDisplayString();
             string requestGlobalName = requestClassName.GetFromGlobal(requestNamespace);
 
+            List<string> failures = new List<string>();
             var classBuilder = ClassBuilder.Create()
                      .WithClassName(model.ValidatorName)
                      .WithNamespace(GlobalNames.ValidatorsNamespace)
@@ -37,10 +40,11 @@ namespace MediatR.ValidationGenerator
                                         var prop = entry.Key;
                                         var attributes = entry.Value;
 
-                                        body.AppendLine($"#region {prop.Name}Validation");
-                                        //TODO: diagnostics
-                                        var results = AttributeService.AppendRulesForAttribute(body, prop, attributes);
-                                        body.AppendLine($"#endregion");
+                                        body.AppendNotEnding($"#region {prop.Name}Validation");
+                                        List<SuccessOrFailure> results = AttributeService.AppendRulesForAttribute(body, prop, attributes);
+                                        var msgs = results.Where(x => x.IsFailure).Select(x => x.FailureMessage!);
+                                        failures.AddRange(msgs);
+                                        body.AppendNotEnding($"#endregion");
                                     }
 
                                     body.AppendLine($"return new {GlobalNames.ValidationResult}({VALIDATOR_VALIDITY_NAME}, {VALIDATOR_ERRORS_LIST_NAME})");
@@ -49,7 +53,9 @@ namespace MediatR.ValidationGenerator
                                 });
                      });
 
-            return classBuilder.Build();
+            string src = classBuilder.Build();
+
+            return (src, failures);
         }
     }
 }
