@@ -2,6 +2,7 @@
 using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -28,17 +29,17 @@ namespace MediatR.ValidationGenerator.RuleGenerators
         {
             SuccessOrFailure result;
             string? regex = GetRegex(attribute);
-            if (regex is not null)
+            if (String.IsNullOrEmpty(regex))
+            {
+                result = SuccessOrFailure.CreateFailure("No proper regex!");
+            }
+            else
             {
                 string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
                 string fullProp = $"{ param }.{ prop.Name}";
                 body.AppendNotEnding($"if({_regexGlobal}.IsMatch({fullProp}, \"{regex}\", {_regexOptionsGlobal}.None, {_timeSpanGlobal}.FromSeconds(3)) == false)");
                 body.AppendError($"nameof({fullProp})", "\"Does not fulfill regex\"", true);
                 result = true;
-            }
-            else
-            {
-                result = SuccessOrFailure.CreateFailure("No proper regex!");
             }
             return result;
         }
