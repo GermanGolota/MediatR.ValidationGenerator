@@ -7,16 +7,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
 {
-    public class RequiredRuleGenerator : IRuleGenerator
+    public class RequiredRuleGenerator : AttributeRuleGenerator
     {
-        private readonly string _requiredAttributeName = nameof(RequiredAttribute);
-        public bool IsMatchingAttribute(AttributeData attribute)
-        {
-            string attributeName = attribute.AttributeClass?.Name ?? "";
-            return AttributeHelper.IsTheSameAttribute(attributeName, _requiredAttributeName);
-        }
+        public override string AttributeName => nameof(RequiredAttribute);
 
-        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 

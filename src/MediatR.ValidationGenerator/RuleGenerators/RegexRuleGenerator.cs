@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MediatR.ValidationGenerator.RuleGenerators
 {
-    public class RegexRuleGenerator : IRuleGenerator
+    public class RegexRuleGenerator : AttributeRuleGenerator
     {
         private static readonly string _regexGlobal =
             "Regex".GetFromGlobal("System.Text.RegularExpressions");
@@ -18,14 +18,9 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 
         private static readonly string _timeSpanGlobal = nameof(System.TimeSpan).GetFromGlobal(nameof(System));
 
-        private static readonly string _regexAttributeName = nameof(RegularExpressionAttribute);
-        public bool IsMatchingAttribute(AttributeData attribute)
-        {
-            string attributeName = attribute.AttributeClass?.Name ?? "";
-            return AttributeHelper.IsTheSameAttribute(attributeName, _regexAttributeName);
-        }
+        public override string AttributeName => nameof(RegularExpressionAttribute);
 
-        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             SuccessOrFailure result;
             string? regex = GetRegex(attribute);
