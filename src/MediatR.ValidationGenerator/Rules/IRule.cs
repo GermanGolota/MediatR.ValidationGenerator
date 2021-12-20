@@ -1,14 +1,13 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace MediatR.ValidationGenerator.RuleGenerators
+namespace MediatR.ValidationGenerator.Rules
 {
-    public interface IRuleGenerator
+    public interface IRule
     {
         bool IsMatchingAttribute(AttributeData attribute);
-        SuccessOrFailure GenerateRuleFor(
+        SuccessOrFailure AppendFor(
             IPropertySymbol prop,
             AttributeData attribute,
             MethodBodyBuilder body);

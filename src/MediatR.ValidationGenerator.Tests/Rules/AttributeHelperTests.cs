@@ -1,8 +1,8 @@
-﻿using MediatR.ValidationGenerator.RuleGenerators;
+﻿using MediatR.ValidationGenerator.Rules;
 using System.ComponentModel.DataAnnotations;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Tests.RuleGenerators
+namespace MediatR.ValidationGenerator.Tests.Rules
 {
     public class AttributeHelperTests
     {

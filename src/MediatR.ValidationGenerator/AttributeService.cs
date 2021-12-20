@@ -1,6 +1,6 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Models;
-using MediatR.ValidationGenerator.RuleGenerators;
+using MediatR.ValidationGenerator.Rules;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace MediatR.ValidationGenerator
     {
         public static bool AttributeIsSupported(AttributeData attribute)
         {
-            var generators = RuleGeneratorsCollector.Collect();
+            var generators = RulesCollector.Collect();
             return generators.Any(x => x.IsMatchingAttribute(attribute));
         }
 
@@ -22,14 +22,14 @@ namespace MediatR.ValidationGenerator
             )
         {
             List<SuccessOrFailure> successOrFailures = new List<SuccessOrFailure>();
-            var generators = RuleGeneratorsCollector.Collect();
+            var generators = RulesCollector.Collect();
             foreach (var attribute in attributes)
             {
                 foreach (var generator in generators)
                 {
                     if (generator.IsMatchingAttribute(attribute))
                     {
-                        var result = generator.GenerateRuleFor(prop, attribute, builder);
+                        var result = generator.AppendFor(prop, attribute, builder);
                         successOrFailures.Add(result);
                     }
                 }

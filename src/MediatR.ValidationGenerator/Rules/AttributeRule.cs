@@ -2,13 +2,12 @@
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
 
-namespace MediatR.ValidationGenerator.RuleGenerators
+namespace MediatR.ValidationGenerator.Rules
 {
-    public abstract class AttributeRuleGenerator : IRuleGenerator
+    public abstract class AttributeRule : IRule
     {
-        public abstract SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body);
+        public abstract SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body);
         public abstract string AttributeName { get; }
-
         public bool IsMatchingAttribute(AttributeData attribute)
         {
             string attributeName = attribute.AttributeClass?.Name ?? "";

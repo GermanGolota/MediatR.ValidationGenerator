@@ -6,9 +6,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace MediatR.ValidationGenerator.RuleGenerators
+namespace MediatR.ValidationGenerator.Rules
 {
-    public class RegexRuleGenerator : AttributeRuleGenerator
+    public class RegexRule : AttributeRule
     {
         private static readonly string _regexGlobal =
             "Regex".GetFromGlobal("System.Text.RegularExpressions");
@@ -20,7 +20,7 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 
         public override string AttributeName => nameof(RegularExpressionAttribute);
 
-        public override SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             SuccessOrFailure result;
             string? regex = GetRegex(attribute);

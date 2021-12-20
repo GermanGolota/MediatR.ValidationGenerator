@@ -5,13 +5,13 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MediatR.ValidationGenerator.RuleGenerators
+namespace MediatR.ValidationGenerator.Rules
 {
-    public class RequiredRuleGenerator : AttributeRuleGenerator
+    public class RequiredRule : AttributeRule
     {
         public override string AttributeName => nameof(RequiredAttribute);
 
-        public override SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 
