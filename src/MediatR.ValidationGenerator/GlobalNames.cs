@@ -4,6 +4,7 @@ namespace MediatR.ValidationGenerator
 {
     public static class GlobalNames
     {
+        public static readonly string PublicNamespace = "MediatR.ValidationGenerator";
         public static readonly string InternalNamespace = "MediatR.ValidationGenerator.Internal";
 
         public static readonly string ValidationFailureLocal = "ValidationFailure";
@@ -43,5 +44,10 @@ namespace MediatR.ValidationGenerator
 
         public static readonly string ServiceDescriptor = "ServiceDescriptor"
             .GetFromGlobal("Microsoft.Extensions.DependencyInjection");
+
+        public static readonly string ValidationAttribute = "ValidationAttribute"
+            .GetFromGlobal("System.ComponentModel.DataAnnotations");
+
+        public static readonly string CustomValidatorAttribute = "CustomValidatorAttribute";
     }
 }

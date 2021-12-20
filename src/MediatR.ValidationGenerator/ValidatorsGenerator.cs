@@ -19,6 +19,7 @@ namespace MediatR.ValidationGenerator
             context.RegisterPostInitializationOutput(ctx =>
             {
                 ctx.AddSource("Validator.g.cs", StaticSourceCodes.Validator);
+                ctx.AddSource("Attributes.g.cs", StaticSourceCodes.Attributes);
                 ctx.AddSource("ValidationBehavior.g.cs", StaticSourceCodes.Behavior);
                 ctx.AddSource("DIExtensions.g.cs", StaticSourceCodes.DIExtensions);
             });

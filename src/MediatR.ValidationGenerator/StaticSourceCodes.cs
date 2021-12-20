@@ -140,7 +140,7 @@ using System.Linq;
 using System.Reflection;
 using {GlobalNames.InternalNamespace};
 
-namespace MediatR.ValidationGenerator
+namespace {GlobalNames.PublicNamespace}
 {{
     public static class DiExtensions
     {{
@@ -175,5 +175,24 @@ namespace {GlobalNames.InternalNamespace}
     }}
 }}
 ";
+
+        public static readonly string Attributes = $@"
+namespace {GlobalNames.PublicNamespace}
+{{
+    public class {GlobalNames.CustomValidatorAttribute} : {GlobalNames.ValidationAttribute}
+    {{
+        public {GlobalNames.CustomValidatorAttribute}({GlobalNames.Type} validatorType, string validationMethod)
+        {{
+            ValidatorType = validatorType;
+            ValidationMethod = validationMethod;
+        }}
+    
+        public {GlobalNames.Type} ValidatorType {{ get; set; }}
+        public string ValidationMethod {{ get; set; }}
+    }}                
+}}
+";
     }
 }
+
+
