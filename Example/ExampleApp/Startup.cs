@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using MediatR.ValidationGenerator;
 using MediatR;
 using Microsoft.OpenApi.Models;
+using ExampleApp.Services;
 
 namespace ExampleApp
 {
@@ -12,6 +13,9 @@ namespace ExampleApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, CacheService>();
+
             //MediatR
             var assemblies = new[] { typeof(Startup).Assembly };
             services.AddMediatR(assemblies);
