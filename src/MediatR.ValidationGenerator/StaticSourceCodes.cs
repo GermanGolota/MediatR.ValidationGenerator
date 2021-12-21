@@ -4,7 +4,7 @@ namespace MediatR.ValidationGenerator
 {
     public static class StaticSourceCodes
     {
-        public static readonly string Validator = @$"using System;
+        public static readonly string ValidatorDefinition = @$"using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
