@@ -1,4 +1,6 @@
-﻿namespace MediatR.ValidationGenerator
+﻿using static MediatR.ValidationGenerator.GlobalNames;
+
+namespace MediatR.ValidationGenerator
 {
     public static class StaticSourceCodes
     {
@@ -7,16 +9,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace {GlobalNames.InternalNamespace}
+namespace {InternalNamespace}
 {{
-    public interface {GlobalNames.ValidatorLocal}<in T>
+    public interface {ValidatorLocal}<in T>
     {{
-        {GlobalNames.ValidationResult} Validate(T value);
+        {ValidationResult} Validate(T value);
     }}
 
-    public class {GlobalNames.ValidationResultLocal}
+    public class {ValidationResultLocal}
     {{
-        public {GlobalNames.ValidationResultLocal}(bool isValid, List<{GlobalNames.ValidationFailure}> errors)
+        public {ValidationResultLocal}(bool isValid, List<{ValidationFailure}> errors)
         {{
             IsValid = isValid;
             Errors = errors;
@@ -28,12 +30,12 @@ namespace {GlobalNames.InternalNamespace}
         //
         // Summary:
         //     A collection of errors
-        public List<{GlobalNames.ValidationFailure}> Errors {{ get; }}
+        public List<{ValidationFailure}> Errors {{ get; }}
     }}
 
-    public class {GlobalNames.ValidationFailureLocal}
+    public class {ValidationFailureLocal}
     {{
-        public {GlobalNames.ValidationFailureLocal}(string propertyName, string errorMessage)
+        public {ValidationFailureLocal}(string propertyName, string errorMessage)
         {{
             PropertyName = propertyName;
             ErrorMessage = errorMessage;
@@ -56,18 +58,18 @@ namespace {GlobalNames.InternalNamespace}
         /// <summary>
         /// Validation errors
         /// </summary>
-        public IEnumerable<{GlobalNames.ValidationFailure}> Errors {{ get; private set; }}
+        public IEnumerable<{ValidationFailure}> Errors {{ get; private set; }}
 
         /// <summary>
         /// Creates a new ValidationException
         /// </summary>
         /// <param name=""errors""></param>
-        public ValidationException(IEnumerable<{GlobalNames.ValidationFailure}> errors) : base(BuildErrorMessage(errors))
+        public ValidationException(IEnumerable<{ValidationFailure}> errors) : base(BuildErrorMessage(errors))
         {{
             Errors = errors;
         }}
 
-        private static string BuildErrorMessage(IEnumerable<{GlobalNames.ValidationFailure}> errors)
+        private static string BuildErrorMessage(IEnumerable<{ValidationFailure}> errors)
         {{
             var arr = errors.Select(x => $""{{Environment.NewLine}} -- {{x.PropertyName}}: {{x.ErrorMessage}}"");
             return ""Validation failed: "" + string.Join(string.Empty, arr);
@@ -92,14 +94,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace {GlobalNames.InternalNamespace}
+namespace {InternalNamespace}
 {{
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
          where TRequest : IRequest<TResponse>
     {{
-        private readonly IEnumerable<{GlobalNames.Validator}<TRequest>> _validators;
+        private readonly IEnumerable<{Validator}<TRequest>> _validators;
 
-        public ValidationBehavior(IEnumerable<{GlobalNames.Validator}<TRequest>> validators)
+        public ValidationBehavior(IEnumerable<{Validator}<TRequest>> validators)
         {{
             _validators = validators;
         }}
@@ -109,7 +111,7 @@ namespace {GlobalNames.InternalNamespace}
             RequestHandlerDelegate<TResponse> next
         )
         {{
-            List<{GlobalNames.ValidationFailure}> failures = new List<{GlobalNames.ValidationFailure}>();
+            List<{ValidationFailure}> failures = new List<{ValidationFailure}>();
             foreach (var validator in _validators)
             {{
                 var result = validator.Validate(request);
@@ -138,9 +140,9 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-using {GlobalNames.InternalNamespace};
+using {InternalNamespace};
 
-namespace {GlobalNames.PublicNamespace}
+namespace {PublicNamespace}
 {{
     public static class DiExtensions
     {{
@@ -150,12 +152,12 @@ namespace {GlobalNames.PublicNamespace}
             )
         {{
             services.Add(new ServiceDescriptor(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>), lifetime));
-            var registrationsContainer = new {GlobalNames.DIRegistrations}();
-            foreach (var registration in registrationsContainer.{GlobalNames.DIRegistrationsDict})
+            var registrationsContainer = new {DIRegistrations}();
+            foreach (var registration in registrationsContainer.{DIRegistrationsDict})
             {{
                 var interfaceType = registration.Key;       
                 var implementationType = registration.Value;
-                var descriptor = new {GlobalNames.ServiceDescriptor}(interfaceType, implementationType, lifetime);
+                var descriptor = new {ServiceDescriptor}(interfaceType, implementationType, lifetime);
                 services.Add(descriptor);
             }}
             
@@ -165,47 +167,47 @@ namespace {GlobalNames.PublicNamespace}
 
     public static class ServiceProviderExtensions
     {{
-        public static {GlobalNames.ServiceProvider} ApplyToGeneratedValidators(this {GlobalNames.ServiceProvider} services)
+        public static {ServiceProvider} ApplyToGeneratedValidators(this {ServiceProvider} services)
         {{
-            {GlobalNames.DIProvider}.ResolveFunction = 
-                new {GlobalNames.Lazy}<{GlobalNames.Func}<{GlobalNames.Type}, object>>(
+            {DIProvider}.ResolveFunction = 
+                new {Lazy}<{Func}<{Type}, object>>(
                     () => 
-                        (type) => {GlobalNames.ServiceProviderServiceExtensions}.GetRequiredService(services, type)
+                        (type) => {ServiceProviderServiceExtensions}.GetRequiredService(services, type)
                 );
             return services;
         }}
     }}
 
-    public static class {GlobalNames.DIProviderLocal}
+    public static class {DIProviderLocal}
     {{
-        public static {GlobalNames.Lazy}<{GlobalNames.Func}<{GlobalNames.Type}, object>> {GlobalNames.ResolveFunction};
+        public static {Lazy}<{Func}<{Type}, object>> {ResolveFunction};
     }}
 }}
 
-namespace {GlobalNames.InternalNamespace}
+namespace {InternalNamespace}
 {{
     //partial class for registrations that would get populated in generated second part of this class
-    internal partial class {GlobalNames.DIRegistrationsLocal}
+    internal partial class {DIRegistrationsLocal}
     {{
         //interface to implementation
-        public {GlobalNames.Dictionary}<{GlobalNames.Type},{GlobalNames.Type}> {GlobalNames.DIRegistrationsDict} {{ get; }} 
-                = new {GlobalNames.Dictionary}<{GlobalNames.Type},{GlobalNames.Type}>();
+        public {Dictionary}<{Type},{Type}> {DIRegistrationsDict} {{ get; }} 
+                = new {Dictionary}<{Type},{Type}>();
     }}
 }}
 ";
 
         public static readonly string Attributes = $@"
-namespace {GlobalNames.PublicNamespace}
+namespace {PublicNamespace}
 {{
-    public class {GlobalNames.CustomValidatorAttribute} : {GlobalNames.ValidationAttribute}
+    public class {CustomValidatorAttribute} : {ValidationAttribute}
     {{
-        public {GlobalNames.CustomValidatorAttribute}({GlobalNames.Type} validatorType, string validationMethod)
+        public {CustomValidatorAttribute}({Type} validatorType, string validationMethod)
         {{
             ValidatorType = validatorType;
             ValidationMethod = validationMethod;
         }}
     
-        public {GlobalNames.Type} ValidatorType {{ get; set; }}
+        public {Type} ValidatorType {{ get; set; }}
         public string ValidationMethod {{ get; set; }}
     }}                
 }}
