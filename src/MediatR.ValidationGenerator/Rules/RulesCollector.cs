@@ -4,16 +4,12 @@ namespace MediatR.ValidationGenerator.Rules
 {
     public static class RulesCollector
     {
-        private static readonly IEnumerable<IRule> _rules;
-
-        static RulesCollector()
-        {
-            _rules = new List<IRule>()
+        private static readonly IEnumerable<IRule> _rules = new List<IRule>()
             {
                 new RequiredRule(),
-                new RegexRule()
+                new RegexRule(),
+                new CustomValidatorRule()
             };
-        }
 
         public static IEnumerable<IRule> Collect()
         {

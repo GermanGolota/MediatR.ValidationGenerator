@@ -199,7 +199,7 @@ namespace {InternalNamespace}
         public static readonly string Attributes = $@"
 namespace {PublicNamespace}
 {{
-    public class {CustomValidatorAttribute} : {ValidationAttribute}
+    public class {CustomValidatorAttribute} : {Attribute}
     {{
         public {CustomValidatorAttribute}({Type} validatorType, string validationMethod)
         {{

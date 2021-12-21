@@ -14,7 +14,7 @@ namespace ExampleApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddScoped<ICacheService, CacheService>();
+            services.AddSingleton<ICacheService, CacheService>();
 
             //MediatR
             var assemblies = new[] { typeof(Startup).Assembly };

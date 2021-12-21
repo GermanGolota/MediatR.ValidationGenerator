@@ -57,9 +57,9 @@ namespace MediatR.ValidationGenerator
 
         public static readonly string ServiceDescriptor = "ServiceDescriptor"
             .GetFromGlobal("Microsoft.Extensions.DependencyInjection");
-
-        public static readonly string ValidationAttribute = "ValidationAttribute"
-            .GetFromGlobal("System.ComponentModel.DataAnnotations");
+       
+        public static readonly string Attribute = "Attribute"
+            .GetFromGlobal("System");
 
         public static readonly string CustomValidatorAttribute = "CustomValidatorAttribute";
         public static readonly string DIProviderLocal = "DIProvider";
@@ -67,6 +67,6 @@ namespace MediatR.ValidationGenerator
             .GetFromGlobal(PublicNamespace);
 
         public static readonly string ResolveFunction = "ResolveFunction";
-        public static readonly string ResolveFunctionFull = $"{DIProvider}.{ResolveFunction}";
+        public static readonly string ResolveFunctionFull = $"{DIProvider}.{ResolveFunction}.Value";
     }
 }

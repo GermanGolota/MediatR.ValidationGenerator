@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace ExampleApp.Services
 {
@@ -18,7 +19,8 @@ namespace ExampleApp.Services
 
         public bool Has(string key)
         {
-            return _cache.TryGetValue(key, out string _);
+            bool canGet = _cache.TryGetValue(key, out string value);
+            return canGet && !String.IsNullOrEmpty(value);
         }
     }
 }
