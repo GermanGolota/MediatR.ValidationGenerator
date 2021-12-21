@@ -62,8 +62,11 @@ namespace MediatR.ValidationGenerator
             .GetFromGlobal("System.ComponentModel.DataAnnotations");
 
         public static readonly string CustomValidatorAttribute = "CustomValidatorAttribute";
-
-        public static readonly string DIProvider = nameof(DIProvider)
+        public static readonly string DIProviderLocal = "DIProvider";
+        public static readonly string DIProvider = DIProviderLocal
             .GetFromGlobal(PublicNamespace);
+
+        public static readonly string ResolveFunction = "ResolveFunction";
+        public static readonly string ResolveFunctionFull = $"{DIProvider}.{ResolveFunction}";
     }
 }

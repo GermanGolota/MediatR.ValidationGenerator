@@ -175,6 +175,11 @@ namespace {GlobalNames.PublicNamespace}
             return services;
         }}
     }}
+
+    public static class {GlobalNames.DIProviderLocal}
+    {{
+        public static {GlobalNames.Lazy}<{GlobalNames.Func}<{GlobalNames.Type}, object>> {GlobalNames.ResolveFunction};
+    }}
 }}
 
 namespace {GlobalNames.InternalNamespace}
