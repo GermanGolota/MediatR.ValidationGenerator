@@ -40,6 +40,19 @@ namespace MediatR.ValidationGenerator
         public static readonly string Type = nameof(System.Type)
           .GetFromGlobal(nameof(System));
 
+        public static readonly string Func = "Func"
+            .GetFromGlobal("System");
+
+        public static readonly string Lazy = "Lazy"
+            .GetFromGlobal("System");
+
+        public static readonly string ServiceProvider = nameof(System.IServiceProvider)
+            .GetFromGlobal("System");
+
+        public static readonly string ServiceProviderServiceExtensions = "ServiceProviderServiceExtensions"
+            .GetFromGlobal("Microsoft.Extensions.DependencyInjection");
+
+
         public static readonly string ValidatorsNamespace = "Validators.Generated";
 
         public static readonly string ServiceDescriptor = "ServiceDescriptor"
@@ -49,5 +62,8 @@ namespace MediatR.ValidationGenerator
             .GetFromGlobal("System.ComponentModel.DataAnnotations");
 
         public static readonly string CustomValidatorAttribute = "CustomValidatorAttribute";
+
+        public static readonly string DIProvider = nameof(DIProvider)
+            .GetFromGlobal(PublicNamespace);
     }
 }

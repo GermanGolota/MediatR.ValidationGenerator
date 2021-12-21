@@ -162,6 +162,19 @@ namespace {GlobalNames.PublicNamespace}
             return services;
         }}
     }}
+
+    public static class ServiceProviderExtensions
+    {{
+        public static {GlobalNames.ServiceProvider} ApplyToGeneratedValidators(this {GlobalNames.ServiceProvider} services)
+        {{
+            {GlobalNames.DIProvider}.ResolveFunction = 
+                new {GlobalNames.Lazy}<{GlobalNames.Func}<{GlobalNames.Type}, object>>(
+                    () => 
+                        (type) => {GlobalNames.ServiceProviderServiceExtensions}.GetRequiredService(services, type)
+                );
+            return services;
+        }}
+    }}
 }}
 
 namespace {GlobalNames.InternalNamespace}
