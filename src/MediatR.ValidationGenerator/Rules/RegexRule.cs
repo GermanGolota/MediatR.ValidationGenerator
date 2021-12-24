@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MediatR.ValidationGenerator.Rules
 {
-    public class RegexRule : AttributeRule
+    public class RegexRule : AttributeRuleNoServices
     {
         private static readonly string _regexGlobal =
             "Regex".GetFromGlobal("System.Text.RegularExpressions");
@@ -20,7 +20,9 @@ namespace MediatR.ValidationGenerator.Rules
 
         public override string AttributeName => nameof(RegularExpressionAttribute);
 
-        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(
+            IPropertySymbol prop, AttributeData attribute, 
+            MethodBodyBuilder body, ServicesContainer _)
         {
             SuccessOrFailure result;
             string? regex = GetRegex(attribute);

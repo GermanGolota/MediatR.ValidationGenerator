@@ -2,13 +2,17 @@
 using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MediatR.ValidationGenerator.Rules
 {
     public class CustomValidatorRule : AttributeRule
     {
         public override string AttributeName => GlobalNames.CustomValidatorAttribute;
-        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(
+            IPropertySymbol prop, AttributeData attribute, 
+            MethodBodyBuilder body, ServicesContainer services)
         {
             var (type, method) = GetArgs(attribute);
             SuccessOrFailure result;
@@ -26,6 +30,21 @@ namespace MediatR.ValidationGenerator.Rules
             else
             {
                 result = SuccessOrFailure.CreateFailure("Type or method name was not provided for Custom Validator Attribute");
+            }
+            return result;
+        }
+
+        public override IEnumerable<ITypeSymbol> GetRequiredServices(AttributeData attribute)
+        {
+            var type = GetArgs(attribute).type;
+            IEnumerable<ITypeSymbol> result;
+            if (type is null)
+            {
+                result = Enumerable.Empty<ITypeSymbol>();
+            }
+            else
+            {
+                result = new[] { type };
             }
             return result;
         }

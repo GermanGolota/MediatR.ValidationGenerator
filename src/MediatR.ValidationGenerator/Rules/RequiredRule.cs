@@ -7,11 +7,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MediatR.ValidationGenerator.Rules
 {
-    public class RequiredRule : AttributeRule
+    public class RequiredRule : AttributeRuleNoServices
     {
         public override string AttributeName => nameof(RequiredAttribute);
 
-        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, 
+            MethodBodyBuilder body, ServicesContainer _)
         {
             string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 

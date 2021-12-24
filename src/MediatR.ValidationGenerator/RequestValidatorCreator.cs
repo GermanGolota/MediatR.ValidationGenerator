@@ -1,6 +1,7 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +19,9 @@ namespace MediatR.ValidationGenerator
             string requestClassName = model.RequestClass.MetadataName;
             string requestNamespace = model.RequestClass.ContainingNamespace.ToDisplayString();
             string requestGlobalName = requestClassName.GetFromGlobal(requestNamespace);
+
+            var neededTypes = AttributeService.GetRequiredServices(model.PropertyToSupportedAttributes);
+            var container = new ServicesContainer(neededTypes);
 
             List<string> failures = new List<string>();
             var classBuilder = ClassBuilder.Create()
@@ -41,7 +45,7 @@ namespace MediatR.ValidationGenerator
                                         var attributes = entry.Value;
 
                                         body.AppendNotEnding($"#region {prop.Name}Validation");
-                                        List<SuccessOrFailure> results = AttributeService.AppendRulesForAttribute(body, prop, attributes);
+                                        var results = AttributeService.AppendRulesForAttribute(body, prop, attributes, container);
                                         var msgs = results.Where(x => x.IsFailure).Select(x => x.FailureMessage!);
                                         failures.AddRange(msgs);
                                         body.AppendNotEnding($"#endregion");
