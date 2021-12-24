@@ -8,7 +8,7 @@ namespace MediatR.ValidationGenerator.Tests.Extensions
 
     public class GeneralExtensionsTests
     {
-        private static Func<string, int, string> DefaultFormatter = (name, number) => $"{name}_{number}";
+        private static Func<string, int, string> DefaultFormatter = (name, number) => number == 0 ? name : $"{name}_{number}";
         [Fact]
         public void PreventDuplicateNames_ShouldDoNothing_WhenNoDuplicateNames()
         {

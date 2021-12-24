@@ -12,8 +12,7 @@ namespace MediatR.ValidationGenerator.Extensions
         /// </summary>
         /// <param name="nameFormatter">
         /// Receives the duplicated string and the number of times it has been repeated so far
-        /// Note: It starts from 1, indicating that there already were 1 item with the same name
-        /// First occurences of names are returned as is without applying formatter
+        /// starting from 0
         /// </param>
         /// <returns>Returns correspondands between item and its unique name</returns>
         public static IEnumerable<string> PreventDuplicateNames(
@@ -25,17 +24,18 @@ namespace MediatR.ValidationGenerator.Extensions
 
             return items.Select(name =>
             {
+                int repetionNumber;
                 if (visitedCounts.ContainsKey(name))
                 {
                     visitedCounts[name]++;
-                    int repetionNumber = visitedCounts[name];
-                    name = nameFormatter(name, repetionNumber);
+                    repetionNumber = visitedCounts[name];
                 }
                 else
                 {
-                    visitedCounts.Add(name, 0);
+                    repetionNumber = 0;
+                    visitedCounts.Add(name, repetionNumber);
                 }
-                return name;
+                return nameFormatter(name, repetionNumber);
             });
         }
 
