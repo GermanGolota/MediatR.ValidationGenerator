@@ -164,24 +164,6 @@ namespace {PublicNamespace}
             return services;
         }}
     }}
-
-    public static class ServiceProviderExtensions
-    {{
-        public static {ServiceProvider} ApplyToGeneratedValidators(this {ServiceProvider} services)
-        {{
-            {DIProvider}.ResolveFunction = 
-                new {Lazy}<{Func}<{Type}, object>>(
-                    () => 
-                        (type) => {ServiceProviderServiceExtensions}.GetRequiredService(services, type)
-                );
-            return services;
-        }}
-    }}
-
-    public static class {DIProviderLocal}
-    {{
-        public static {Lazy}<{Func}<{Type}, object>> {ResolveFunction};
-    }}
 }}
 
 namespace {InternalNamespace}
