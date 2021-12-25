@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.ValidationGenerator.Tests", "MediatR.ValidationGenerator.Tests\MediatR.ValidationGenerator.Tests.csproj", "{669B7486-3413-4C6D-B3C8-DFA26057C221}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleApp", "..\Example\ExampleApp\ExampleApp.csproj", "{73F6FAB7-809C-4301-B48F-B88E97D771CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{669B7486-3413-4C6D-B3C8-DFA26057C221}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{669B7486-3413-4C6D-B3C8-DFA26057C221}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{669B7486-3413-4C6D-B3C8-DFA26057C221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73F6FAB7-809C-4301-B48F-B88E97D771CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73F6FAB7-809C-4301-B48F-B88E97D771CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73F6FAB7-809C-4301-B48F-B88E97D771CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73F6FAB7-809C-4301-B48F-B88E97D771CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

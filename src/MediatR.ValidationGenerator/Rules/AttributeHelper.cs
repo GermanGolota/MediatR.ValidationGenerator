@@ -1,4 +1,4 @@
-﻿namespace MediatR.ValidationGenerator.RuleGenerators
+﻿namespace MediatR.ValidationGenerator.Rules
 {
     public static class AttributeHelper
     {

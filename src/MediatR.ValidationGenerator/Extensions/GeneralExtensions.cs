@@ -5,8 +5,40 @@ using System.Text;
 
 namespace MediatR.ValidationGenerator.Extensions
 {
-    internal static class GeneralExtensions
+    public static class GeneralExtensions
     {
+        /// <summary>
+        /// Would prevent provided string from having duplicates
+        /// </summary>
+        /// <param name="nameFormatter">
+        /// Receives the duplicated string and the number of times it has been repeated so far
+        /// starting from 0
+        /// </param>
+        /// <returns>Returns correspondands between item and its unique name</returns>
+        public static IEnumerable<string> PreventDuplicateNames(
+            this IEnumerable<string> items,
+            Func<string, int, string> nameFormatter
+            )
+        {
+            Dictionary<string, int> visitedCounts = new Dictionary<string, int>();
+
+            return items.Select(name =>
+            {
+                int repetionNumber;
+                if (visitedCounts.ContainsKey(name))
+                {
+                    visitedCounts[name]++;
+                    repetionNumber = visitedCounts[name];
+                }
+                else
+                {
+                    repetionNumber = 0;
+                    visitedCounts.Add(name, repetionNumber);
+                }
+                return nameFormatter(name, repetionNumber);
+            });
+        }
+
         public static string GetFromGlobal(this string name, string namespaceName)
         {
             StringBuilder sb = new();

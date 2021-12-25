@@ -6,7 +6,7 @@ namespace MediatR.ValidationGenerator.Tests.Builders
     public class ClassBuilderTests
     {
         [Fact]
-        public void Build_ShouldBuild()
+        public void Build_ShouldBuild_WithOneMethod()
         {
             //Arrange
             var builder = ClassBuilder.Create()
@@ -30,6 +30,48 @@ namespace TestNamespace
     {
         public void DoNothing()
         {
+        }
+    }
+}
+".RemoveFirstNewLine();
+            //Act
+            var actualClass = builder.Build();
+            //Assert
+            Assert.Equal(expectedClass, actualClass);
+        }
+
+
+        [Fact]
+        public void Build_ShouldBuild_WithFieldsAndCtor()
+        {
+            //Arrange
+            var builder = ClassBuilder.Create()
+                .WithClassName("DomainModelNameService")
+                .WithNamespace("Application")
+                .Implementing("IDomainModelNameService")
+                .UsingNamespace("System")
+                .UsingNamespace("Microsoft.Extensions.Caching.Abstractions")
+                .WithAccessModifier(AccessModifier.Public)
+                .WithField(new FieldModel("_cache", "IMemoryCache"))
+                .WithConstructor((ctor) =>
+                    ctor
+                        .WithModifier(AccessModifier.Public)
+                        .WithParameter("IMemoryCache", "cache")
+                        .WithBody(body => body.AppendLine("_cache = cache"))
+                );
+            string expectedClass = @"
+using System;
+using Microsoft.Extensions.Caching.Abstractions;
+
+namespace Application
+{
+    public class DomainModelNameService : IDomainModelNameService
+    {
+        private IMemoryCache _cache;
+
+        public DomainModelNameService(IMemoryCache cache)
+        {
+            _cache = cache;
         }
     }
 }

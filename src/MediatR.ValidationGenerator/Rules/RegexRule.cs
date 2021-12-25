@@ -2,12 +2,13 @@
 using MediatR.ValidationGenerator.Extensions;
 using MediatR.ValidationGenerator.Models;
 using Microsoft.CodeAnalysis;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace MediatR.ValidationGenerator.RuleGenerators
+namespace MediatR.ValidationGenerator.Rules
 {
-    public class RegexRuleGenerator : IRuleGenerator
+    public class RegexRule : AttributeRuleNoServices
     {
         private static readonly string _regexGlobal =
             "Regex".GetFromGlobal("System.Text.RegularExpressions");
@@ -17,28 +18,25 @@ namespace MediatR.ValidationGenerator.RuleGenerators
 
         private static readonly string _timeSpanGlobal = nameof(System.TimeSpan).GetFromGlobal(nameof(System));
 
-        private static readonly string _regexAttributeName = nameof(RegularExpressionAttribute);
-        public bool IsMatchingAttribute(AttributeData attribute)
-        {
-            string attributeName = attribute.AttributeClass?.Name ?? "";
-            return AttributeHelper.IsTheSameAttribute(attributeName, _regexAttributeName);
-        }
+        public override string AttributeName => nameof(RegularExpressionAttribute);
 
-        public SuccessOrFailure GenerateRuleFor(IPropertySymbol prop, AttributeData attribute, MethodBodyBuilder body)
+        public override SuccessOrFailure AppendFor(
+            IPropertySymbol prop, AttributeData attribute, 
+            MethodBodyBuilder body, ServicesContainer _)
         {
             SuccessOrFailure result;
             string? regex = GetRegex(attribute);
-            if (regex is not null)
+            if (String.IsNullOrEmpty(regex))
+            {
+                result = SuccessOrFailure.CreateFailure("No proper regex!");
+            }
+            else
             {
                 string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
                 string fullProp = $"{ param }.{ prop.Name}";
                 body.AppendNotEnding($"if({_regexGlobal}.IsMatch({fullProp}, \"{regex}\", {_regexOptionsGlobal}.None, {_timeSpanGlobal}.FromSeconds(3)) == false)");
                 body.AppendError($"nameof({fullProp})", "\"Does not fulfill regex\"", true);
                 result = true;
-            }
-            else
-            {
-                result = SuccessOrFailure.CreateFailure("No proper regex!");
             }
             return result;
         }

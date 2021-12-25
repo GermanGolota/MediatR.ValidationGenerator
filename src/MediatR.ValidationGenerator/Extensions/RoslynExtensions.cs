@@ -34,14 +34,25 @@ namespace MediatR.ValidationGenerator.Extensions
             return syntax.IsNotAbstract() && !(syntax is InterfaceDeclarationSyntax);
         }
 
+        public static List<IMethodSymbol> GetAllMethods(this ITypeSymbol type)
+        {
+            return type.GetAllMembers<IMethodSymbol>();
+        }
+
         public static List<IPropertySymbol> GetAllProps(this ITypeSymbol type)
         {
-            List<IPropertySymbol> result = type.GetMembers().OfType<IPropertySymbol>().ToList();
+            return type.GetAllMembers<IPropertySymbol>();
+        }
+
+        //TODO: Fix for overrides
+        public static List<T> GetAllMembers<T>(this ITypeSymbol type) where T : ISymbol 
+        {
+            List<T> result = type.GetMembers().OfType<T>().ToList();
 
             var baseTypes = CollectBaseTypes(type);
             foreach (var baseType in baseTypes)
             {
-                result.AddRange(GetAllProps(baseType));
+                result.AddRange(GetAllMembers<T>(baseType));
             }
 
             return result;
