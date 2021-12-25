@@ -4,11 +4,7 @@ namespace MediatR.ValidationGenerator
 {
     public static class StaticSourceCodes
     {
-        public static readonly string ValidatorDefinition = @$"using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-
+        public static readonly string ValidatorDefinition = @$"
 namespace {InternalNamespace}
 {{
     public interface {ValidatorLocal}<in T>
@@ -18,7 +14,7 @@ namespace {InternalNamespace}
 
     public class {ValidationResultLocal}
     {{
-        public {ValidationResultLocal}(bool isValid, List<{ValidationFailure}> errors)
+        public {ValidationResultLocal}(bool isValid, {List}<{ValidationFailure}> errors)
         {{
             IsValid = isValid;
             Errors = errors;
@@ -30,7 +26,7 @@ namespace {InternalNamespace}
         //
         // Summary:
         //     A collection of errors
-        public List<{ValidationFailure}> Errors {{ get; }}
+        public {List}<{ValidationFailure}> Errors {{ get; }}
     }}
 
     public class {ValidationFailureLocal}
@@ -53,31 +49,35 @@ namespace {InternalNamespace}
     /// <summary>
     /// An exception that represents failed validation
     /// </summary>
-    public class ValidationException : Exception
+    public class {ValidationExceptionLocal} : {Exception}
     {{
         /// <summary>
         /// Validation errors
         /// </summary>
-        public IEnumerable<{ValidationFailure}> Errors {{ get; private set; }}
+        public {Enumerable}<{ValidationFailure}> Errors {{ get; private set; }}
 
         /// <summary>
         /// Creates a new ValidationException
         /// </summary>
         /// <param name=""errors""></param>
-        public ValidationException(IEnumerable<{ValidationFailure}> errors) : base(BuildErrorMessage(errors))
+        public {ValidationExceptionLocal}({Enumerable}<{ValidationFailure}> errors) : base(BuildErrorMessage(errors))
         {{
             Errors = errors;
         }}
 
-        private static string BuildErrorMessage(IEnumerable<{ValidationFailure}> errors)
+        private static string BuildErrorMessage({Enumerable}<{ValidationFailure}> errors)
         {{
-            var arr = errors.Select(x => $""{{Environment.NewLine}} -- {{x.PropertyName}}: {{x.ErrorMessage}}"");
-            return ""Validation failed: "" + string.Join(string.Empty, arr);
+            {List}<string> msgs = new {List}<string>();
+            foreach(var error in errors)
+            {{
+                msgs.Add($""{{({Environment}.NewLine)}} -- {{error.PropertyName}}: {{error.ErrorMessage}}"");
+            }}
+            return ""Validation failed: "" + {String}.Join({String}.Empty, msgs);
         }}
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override void GetObjectData({SerializationInfo} info, {StreamingContext} context)
         {{
-            if (info == null) throw new ArgumentNullException(""info"");
+            if (info == null) throw new {ArgumentNullException}(""info"");
 
             info.AddValue(""errors"", Errors);
             base.GetObjectData(info, context);
@@ -87,31 +87,24 @@ namespace {InternalNamespace}
 ";
 
         public static readonly string Behavior = $@"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace {InternalNamespace}
 {{
-    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class {ValidationBehaviorLocal}<TRequest, TResponse> : {PipelineBehavior}<TRequest, TResponse>
          where TRequest : IRequest<TResponse>
     {{
-        private readonly IEnumerable<{Validator}<TRequest>> _validators;
+        private readonly {Enumerable}<{Validator}<TRequest>> _validators;
 
-        public ValidationBehavior(IEnumerable<{Validator}<TRequest>> validators)
+        public {ValidationBehaviorLocal}({Enumerable}<{Validator}<TRequest>> validators)
         {{
             _validators = validators;
         }}
 
-        public Task<TResponse> Handle(TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next
+        public {Task}<TResponse> Handle(TRequest request,
+            {CancellationToken} cancellationToken,
+            {RequestHandlerDelegate}<TResponse> next
         )
         {{
-            List<{ValidationFailure}> failures = new List<{ValidationFailure}>();
+            {List}<{ValidationFailure}> failures = new {List}<{ValidationFailure}>();
             foreach (var validator in _validators)
             {{
                 var result = validator.Validate(request);
@@ -123,7 +116,7 @@ namespace {InternalNamespace}
 
             if (failures.Count > 0)
             {{
-                throw new ValidationException(failures);
+                throw new {ValidationException}(failures);
             }}
 
             return next();
@@ -134,24 +127,16 @@ namespace {InternalNamespace}
 ";
 
         public static readonly string DIExtensions = $@"
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Reflection;
-using {InternalNamespace};
-
 namespace {PublicNamespace}
 {{
     public static class DiExtensions
     {{
-        public static IServiceCollection AddGeneratedValidators(
-            this IServiceCollection services,
-            ServiceLifetime lifetime = ServiceLifetime.Transient
+        public static {ServiceCollection} AddGeneratedValidators(
+            this {ServiceCollection} services,
+            {ServiceLifetime} lifetime = {ServiceLifetime}.Transient
             )
         {{
-            services.Add(new ServiceDescriptor(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>), lifetime));
+            services.Add(new {ServiceDescriptor}(typeof({PipelineBehavior}<,>), typeof({ValidationBehavior}<,>), lifetime));
             var registrationsContainer = new {DIRegistrations}();
             foreach (var registration in registrationsContainer.{DIRegistrationsDict})
             {{
