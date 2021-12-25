@@ -23,11 +23,33 @@ namespace MediatR.ValidationGenerator
             var neededTypes = AttributeService.GetRequiredServices(model.PropertyToSupportedAttributes);
             var container = new ServicesContainer(neededTypes);
 
+            var fields = neededTypes.Select(type => new FieldModel(container.GetServiceNameFor(type), type.GetGlobalName(), IsReadonly: true));
+
             List<string> failures = new List<string>();
             var classBuilder = ClassBuilder.Create()
                      .WithClassName(model.ValidatorName)
                      .WithNamespace(GlobalNames.ValidatorsNamespace)
                      .Implementing($"{GlobalNames.Validator}<{requestGlobalName}>")
+                     .WithFields(fields)
+                     .WithConstructor(ctor =>
+                     {
+                         foreach (var field in fields)
+                         {
+                             ctor.WithParameter(field.Type, field.Name);
+                         }
+
+                         ctor.WithBody(body =>
+                         {
+                             foreach (var field in fields)
+                             {
+                                 body.AppendLine($"this.{field.Name} = {field.Name}");
+                             }
+
+                             return body;
+                         });
+
+                         return ctor;
+                     })
                      .WithMethod(method =>
                      {
                          return method.WithName(VALIDATE_METHOD_NAME)

@@ -24,6 +24,7 @@ namespace MediatR.ValidationGenerator.Builders
         IClassBuilder WithMethod(Func<IMethodNameSelector, IMethodBuilder> methodBuilder);
         IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder);
         IClassBuilder WithField(FieldModel field);
+        IClassBuilder WithFields(IEnumerable<FieldModel> fields);
         IClassBuilder UsingNamespace(string usedNamespace);
         IClassBuilder Implementing(string className);
     }
@@ -112,6 +113,12 @@ namespace MediatR.ValidationGenerator.Builders
             _fields.Add(field);
             return this;
         }
+
+        public IClassBuilder WithFields(IEnumerable<FieldModel> fields)
+        {
+            _fields.AddRange(fields);
+            return this;
+        }
         #endregion
         #region Build
         public string Build()
@@ -159,7 +166,7 @@ namespace MediatR.ValidationGenerator.Builders
                 string readonlyStr = field.IsReadonly ? " readonly" : "";
                 string staticStr = field.IsStatic ? " static" : "";
                 string modifier = field.Modifier.ToString().ToLower();
-                string fieldStr = $"{modifier} {field.Type}{readonlyStr}{staticStr} {field.Name};";
+                string fieldStr = $"{modifier}{readonlyStr}{staticStr} {field.Type} {field.Name};";
                 sb.AppendLine($"{BuilderUtils.TAB}{BuilderUtils.TAB}{fieldStr}");
             }
 
