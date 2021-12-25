@@ -20,6 +20,7 @@ namespace MediatR.ValidationGenerator.Builders
     public interface IMethodBuilder : IBuilder
     {
         IMethodBuilder AsOverride();
+        IMethodBuilder AsAsync();
         IMethodBuilder AsStatic();
         IMethodBuilder WithBody(Func<MethodBodyBuilder, MethodBodyBuilder> builder);
         IMethodBuilder WithModifier(AccessModifier modifier);
@@ -47,6 +48,7 @@ namespace MediatR.ValidationGenerator.Builders
         private int _leftMargin;
         private bool _isOverride = false;
         private bool _isStatic = false;
+        private bool _isAsync = false;
 
         private AccessModifier _modifier = AccessModifier.Public;
 
@@ -108,6 +110,12 @@ namespace MediatR.ValidationGenerator.Builders
             return this;
         }
 
+        public IMethodBuilder AsAsync()
+        {
+            _isAsync = true;
+            return this;
+        }
+
         public IMethodBuilder WithModifier(AccessModifier modifier)
         {
             _modifier = modifier;
@@ -131,9 +139,10 @@ namespace MediatR.ValidationGenerator.Builders
         {
             string overrideText = _isOverride ? "override " : "";
             string staticText = _isStatic ? "static " : "";
+            string asyncText = _isAsync ? "async " : "";
             StringBuilder signatureBuilder = new StringBuilder();
             signatureBuilder.Repeat(BuilderUtils.TAB, _leftMargin);
-            signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{_returnType} {_methodName}");
+            signatureBuilder.Append($"{_modifier.ToString().ToLower()} {overrideText}{staticText}{asyncText}{_returnType} {_methodName}");
             signatureBuilder.Append("(");
             string parameterStr = BuilderUtils.BuildParameterList(_parameters);
             signatureBuilder.Append(parameterStr);

@@ -53,7 +53,8 @@ namespace MediatR.ValidationGenerator
                      .WithMethod(method =>
                      {
                          return method.WithName(VALIDATE_METHOD_NAME)
-                                .WithReturnType(GlobalNames.ValidationResult)
+                                .WithReturnType($"{GlobalNames.Task}<{GlobalNames.ValidationResult}>")
+                                .AsAsync()
                                 .WithParameter(requestGlobalName, VALIDATOR_PARAMETER_NAME)
                                 .WithBody(body =>
                                 {

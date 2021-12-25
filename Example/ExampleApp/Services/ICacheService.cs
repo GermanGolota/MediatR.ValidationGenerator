@@ -1,8 +1,10 @@
-﻿namespace ExampleApp.Services
+﻿using System.Threading.Tasks;
+
+namespace ExampleApp.Services
 {
     public interface ICacheService
     {
         void Add(string key, string value);
-        bool Has(string key);
+        Task<bool> Has(string key);
     }
 }

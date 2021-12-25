@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Threading.Tasks;
 
 namespace ExampleApp.Services
 {
@@ -17,10 +18,10 @@ namespace ExampleApp.Services
             _cache.Set(key, value);
         }
 
-        public bool Has(string key)
+        public Task<bool> Has(string key)
         {
             bool canGet = _cache.TryGetValue(key, out string value);
-            return canGet && !String.IsNullOrEmpty(value);
+            return Task.FromResult(canGet && !String.IsNullOrEmpty(value));
         }
     }
 }

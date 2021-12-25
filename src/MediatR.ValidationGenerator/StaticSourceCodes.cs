@@ -9,7 +9,7 @@ namespace {InternalNamespace}
 {{
     public interface {ValidatorLocal}<in T>
     {{
-        {ValidationResult} Validate(T value);
+        {Task}<{ValidationResult}> Validate(T value);
     }}
 
     public class {ValidationResultLocal}
@@ -99,7 +99,7 @@ namespace {InternalNamespace}
             _validators = validators;
         }}
 
-        public {Task}<TResponse> Handle(TRequest request,
+        public async {Task}<TResponse> Handle(TRequest request,
             {CancellationToken} cancellationToken,
             {RequestHandlerDelegate}<TResponse> next
         )
@@ -107,7 +107,8 @@ namespace {InternalNamespace}
             {List}<{ValidationFailure}> failures = new {List}<{ValidationFailure}>();
             foreach (var validator in _validators)
             {{
-                var result = validator.Validate(request);
+                //TODO: Optional parallel validation
+                var result = await validator.Validate(request);
                 if (result.Errors is null == false)
                 {{
                     failures.AddRange(result.Errors);
@@ -119,7 +120,7 @@ namespace {InternalNamespace}
                 throw new {ValidationException}(failures);
             }}
 
-            return next();
+            return await next();
         }}
     }}
 }}
