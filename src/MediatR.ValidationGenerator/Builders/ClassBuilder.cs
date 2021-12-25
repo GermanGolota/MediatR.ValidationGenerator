@@ -23,6 +23,7 @@ namespace MediatR.ValidationGenerator.Builders
         IClassBuilder WithAccessModifier(AccessModifier modifier);
         IClassBuilder WithMethod(Func<IMethodNameSelector, IMethodBuilder> methodBuilder);
         IClassBuilder WithConstructor(Func<IClassConstructorBuilder, IClassConstructorBuilder> constructorBuilder);
+        IClassBuilder WithField(FieldModel field);
         IClassBuilder UsingNamespace(string usedNamespace);
         IClassBuilder Implementing(string className);
     }
@@ -48,6 +49,7 @@ namespace MediatR.ValidationGenerator.Builders
         private List<IMethodBuilder> _methods = new List<IMethodBuilder>();
         private IClassConstructorBuilder? _constructor = null;
         private AccessModifier _modifier = AccessModifier.Public;
+        private List<FieldModel> _fields = new List<FieldModel>();
         //required
         private string _className = null!;
         private string _classNamespace = null!;
@@ -104,6 +106,12 @@ namespace MediatR.ValidationGenerator.Builders
             _isPartial = true;
             return this;
         }
+
+        public IClassBuilder WithField(FieldModel field)
+        {
+            _fields.Add(field);
+            return this;
+        }
         #endregion
         #region Build
         public string Build()
@@ -119,8 +127,7 @@ namespace MediatR.ValidationGenerator.Builders
 
             classBuilder.AppendLine($"namespace {_classNamespace}");
             classBuilder.AppendLine("{");
-            string classBody = BuildClassBody();
-            classBuilder.Append(classBody);
+            classBuilder.Append(BuildClassBody());
             classBuilder.AppendLine("}");
 
             return classBuilder.ToString();
@@ -133,12 +140,35 @@ namespace MediatR.ValidationGenerator.Builders
             string signature = BuildSignature(_modifier, _className, _implementsList, _isPartial);
             classBodyBuilder.AppendLine($"{BuilderUtils.TAB}{signature}");
             classBodyBuilder.AppendLine(BuilderUtils.TAB + "{");
+            string fields = BuildFields(_fields);
+            classBodyBuilder.Append(fields);
             var ctor = BuildConstructor(_constructor);
             classBodyBuilder.Append(ctor);
             string methods = BuildMethods(_methods);
             classBodyBuilder.Append(methods);
             classBodyBuilder.AppendLine(BuilderUtils.TAB + "}");
             return classBodyBuilder.ToString();
+        }
+
+        [Pure]
+        private string BuildFields(List<FieldModel> fields)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var field in fields)
+            {
+                string readonlyStr = field.IsReadonly ? " readonly" : "";
+                string staticStr = field.IsStatic ? " static" : "";
+                string modifier = field.Modifier.ToString().ToLower();
+                string fieldStr = $"{modifier} {field.Type}{readonlyStr}{staticStr} {field.Name};";
+                sb.AppendLine($"{BuilderUtils.TAB}{BuilderUtils.TAB}{fieldStr}");
+            }
+
+            if (fields.Count > 0)
+            {
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
 
         [Pure]
