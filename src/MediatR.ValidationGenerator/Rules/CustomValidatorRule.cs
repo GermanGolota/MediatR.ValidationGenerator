@@ -21,8 +21,8 @@ namespace MediatR.ValidationGenerator.Rules
                 string parName = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
                 string propName = prop.Name;
                 string fullProp = $"{parName}.{propName}";
-                string typeStr = type.ToDisplayString();
-                body.AppendNotEnding($"if(({GlobalNames.ResolveFunctionFull}(typeof({typeStr})) as {typeStr}).{method}({fullProp}) == false)");
+                string serviceName = services.GetServiceNameFor(type);
+                body.AppendNotEnding($"if({serviceName}.{method}({fullProp}) == false)");
                 body.AppendError($"nameof({fullProp})", "\"Custom validation failed\"", true);
 
                 result = true;
