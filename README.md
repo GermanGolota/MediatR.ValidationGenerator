@@ -37,3 +37,7 @@ namespace ExampleApp.Requests
 <h2>System.ComponentModel.DataAnnotations:</h2>
 <h4>Required</h4>
 <h4>Regex</h4>
+<h2>MediatR.ValidationGenerator</h2>
+<h4>CustomValidatorAttribute</h4>
+Receives the type of validator and the name of validation method
+Would get the validator type from DI container
