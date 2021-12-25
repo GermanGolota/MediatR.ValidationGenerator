@@ -35,9 +35,9 @@ namespace ExampleApp.Requests
 
 <h1 id="2">Supported attributes</h1>
 <h2>System.ComponentModel.DataAnnotations:</h2>
-<h4>Required</h4>
-<h4>Regex</h4>
+<h3>Required</h3>
+<h3>Regex</h3>
 <h2>MediatR.ValidationGenerator</h2>
-<h4>CustomValidatorAttribute</h4>
+<h3>CustomValidatorAttribute</h3>
 Receives the type of validator and the name of validation method
 Would get the validator type from DI container
