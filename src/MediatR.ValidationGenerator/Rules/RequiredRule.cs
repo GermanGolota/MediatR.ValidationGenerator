@@ -5,107 +5,106 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MediatR.ValidationGenerator.Rules
+namespace MediatR.ValidationGenerator.Rules;
+
+public class RequiredRule : AttributeRuleNoServices
 {
-    public class RequiredRule : AttributeRuleNoServices
+    public override string AttributeName => nameof(RequiredAttribute);
+
+    public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, 
+        MethodBodyBuilder body, ServicesContainer _)
     {
-        public override string AttributeName => nameof(RequiredAttribute);
+        string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
 
-        public override SuccessOrFailure AppendFor(IPropertySymbol prop, AttributeData attribute, 
-            MethodBodyBuilder body, ServicesContainer _)
+        string fullProp = $"{ param }.{ prop.Name}";
+        string errorMessage = GetCustomErrorMessage(attribute) ?? "\"Empty required value\"";
+        bool allowEmpty = ShouldAllowEmptyStr(attribute);
+
+        string condition = GetCondition(prop.Type, fullProp, allowEmpty);
+        body.AppendNotEnding($"if({condition})");
+        body.AppendError($"nameof({fullProp})", errorMessage, true);
+        return true;
+    }
+
+    private bool ShouldAllowEmptyStr(AttributeData attribute)
+    {
+        bool allowEmpty = false;
+        foreach (var arg in attribute.NamedArguments)
         {
-            string param = RequestValidatorCreator.VALIDATOR_PARAMETER_NAME;
+            if (arg.Key == nameof(RequiredAttribute.AllowEmptyStrings))
+            {
+                string val = arg.Value.Value?.ToString() ?? "false";
+                Boolean.TryParse(val, out allowEmpty);
+                break;
+            }
+        }
+        return allowEmpty;
+    }
 
-            string fullProp = $"{ param }.{ prop.Name}";
-            string errorMessage = GetCustomErrorMessage(attribute) ?? "\"Empty required value\"";
-            bool allowEmpty = ShouldAllowEmptyStr(attribute);
-
-            string condition = GetCondition(prop.Type, fullProp, allowEmpty);
-            body.AppendNotEnding($"if({condition})");
-            body.AppendError($"nameof({fullProp})", errorMessage, true);
-            return true;
+    private static string? GetCustomErrorMessage(AttributeData attribute)
+    {
+        string? customErrorMessage = null;
+        var args = attribute.NamedArguments;
+        foreach (var arg in args)
+        {
+            var argName = arg.Key;
+            if (argName == nameof(RequiredAttribute.ErrorMessage))
+            {
+                var argVal = arg.Value;
+                customErrorMessage = argVal.Value?.ToString();
+                break;
+            }
         }
 
-        private bool ShouldAllowEmptyStr(AttributeData attribute)
+        string? result;
+        if (String.IsNullOrEmpty(customErrorMessage))
         {
-            bool allowEmpty = false;
-            foreach (var arg in attribute.NamedArguments)
-            {
-                if (arg.Key == nameof(RequiredAttribute.AllowEmptyStrings))
-                {
-                    string val = arg.Value.Value?.ToString() ?? "false";
-                    Boolean.TryParse(val, out allowEmpty);
-                    break;
-                }
-            }
-            return allowEmpty;
+            result = null;
         }
-
-        private static string? GetCustomErrorMessage(AttributeData attribute)
+        else
         {
-            string? customErrorMessage = null;
-            var args = attribute.NamedArguments;
-            foreach (var arg in args)
-            {
-                var argName = arg.Key;
-                if (argName == nameof(RequiredAttribute.ErrorMessage))
-                {
-                    var argVal = arg.Value;
-                    customErrorMessage = argVal.Value?.ToString();
-                    break;
-                }
-            }
+            result = $"\"{customErrorMessage}\"";
+        }
+        return result;
+    }
 
-            string? result;
-            if (String.IsNullOrEmpty(customErrorMessage))
+    private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
+    {
+        string condition;
+        if (type.IsType("System.String") && allowEmpty == false)
+        {
+            condition = $"{GlobalNames.String}.IsNullOrWhiteSpace({fullProp})";
+        }
+        else
+        {
+            string firstCondition;
+            if (type.IsValueType)
             {
-                result = null;
+                string typeGlobalName = type.GetGlobalName();
+                firstCondition = $"{fullProp}.Equals(default({typeGlobalName}))";
             }
             else
             {
-                result = $"\"{customErrorMessage}\"";
+                firstCondition = $"{fullProp} == null";
             }
-            return result;
-        }
 
-        private static string GetCondition(ITypeSymbol type, string fullProp, bool allowEmpty)
-        {
-            string condition;
-            if (type.IsType("System.String") && allowEmpty == false)
+            string? secondCondition = null;
+            if (type.IsImplementing("ICollection", "System.Collections")
+               || type.IsImplementing("ICollection`1", "System.Collections.Generic"))
             {
-                condition = $"{GlobalNames.String}.IsNullOrWhiteSpace({fullProp})";
+                secondCondition = $"{fullProp}.Count == 0";
             }
             else
             {
-                string firstCondition;
-                if (type.IsValueType)
+                if (type.IsImplementing("IEnumerable", "System.Collections"))
                 {
-                    string typeGlobalName = type.GetGlobalName();
-                    firstCondition = $"{fullProp}.Equals(default({typeGlobalName}))";
+                    secondCondition = $"{fullProp}.GetEnumerator().MoveNext() == false";
                 }
-                else
-                {
-                    firstCondition = $"{fullProp} == null";
-                }
-
-                string? secondCondition = null;
-                if (type.IsImplementing("ICollection", "System.Collections")
-                   || type.IsImplementing("ICollection`1", "System.Collections.Generic"))
-                {
-                    secondCondition = $"{fullProp}.Count == 0";
-                }
-                else
-                {
-                    if (type.IsImplementing("IEnumerable", "System.Collections"))
-                    {
-                        secondCondition = $"{fullProp}.GetEnumerator().MoveNext() == false";
-                    }
-                }
-                string second = secondCondition is null ? "" : $" && {secondCondition}";
-                condition = $"{firstCondition} { second }";
             }
-
-            return condition;
+            string second = secondCondition is null ? "" : $" && {secondCondition}";
+            condition = $"{firstCondition} { second }";
         }
+
+        return condition;
     }
 }

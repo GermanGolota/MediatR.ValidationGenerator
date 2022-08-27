@@ -6,125 +6,124 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
-namespace MediatR.ValidationGenerator
+namespace MediatR.ValidationGenerator;
+
+[Generator(LanguageNames.CSharp)]
+public class ValidatorsGenerator : IIncrementalGenerator
 {
-    [Generator(LanguageNames.CSharp)]
-    public class ValidatorsGenerator : IIncrementalGenerator
+    private static string IREQUEST_INTERFACE_NAME = "IBaseRequest";
+    private static string IREQUEST_INTERFACE_NAMESPACE = "MediatR";
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        private static string IREQUEST_INTERFACE_NAME = "IBaseRequest";
-        private static string IREQUEST_INTERFACE_NAMESPACE = "MediatR";
-
-        public void Initialize(IncrementalGeneratorInitializationContext context)
+        context.RegisterPostInitializationOutput(ctx =>
         {
-            context.RegisterPostInitializationOutput(ctx =>
-            {
-                ctx.AddSource("Validator.g.cs", StaticSourceCodes.ValidatorDefinition);
-                ctx.AddSource("Attributes.g.cs", StaticSourceCodes.Attributes);
-                ctx.AddSource("ValidationBehavior.g.cs", StaticSourceCodes.Behavior);
-                ctx.AddSource("DIExtensions.g.cs", StaticSourceCodes.DIExtensions);
-            });
+            ctx.AddSource("Validator.g.cs", StaticSourceCodes.ValidatorDefinition);
+            ctx.AddSource("Attributes.g.cs", StaticSourceCodes.Attributes);
+            ctx.AddSource("ValidationBehavior.g.cs", StaticSourceCodes.Behavior);
+            ctx.AddSource("DIExtensions.g.cs", StaticSourceCodes.DIExtensions);
+        });
 
-            var typeDeclarations = context.SyntaxProvider
-                .CreateSyntaxProvider(
-                    static (s, _) => s is ClassDeclarationSyntax,
-                    static (ctx, _) =>
-                    {
-                        var info = ctx.SemanticModel.GetDeclaredSymbol(ctx.Node);
-                        var type = info as ITypeSymbol;
-                        TypeScanResult? result;
-                        if (type is not null && type.IsConcreate())
-                        {
-                            result = new(type,
-                                type.IsImplementing(IREQUEST_INTERFACE_NAME, IREQUEST_INTERFACE_NAMESPACE));
-                        }
-                        else
-                        {
-                            result = null;
-                        }
-
-                        return result;
-                    })
-                .Where(x => x is not null && x.ImplementsIRequest)
-                .Select((scanResult, _) => GetValidationModel(scanResult!))
-                .Where(x => x is not null)
-                .Select((x, _) => (x!));
-
-            var compilationAndTypes = context.CompilationProvider.Combine(typeDeclarations.Collect());
-
-            context.RegisterSourceOutput(compilationAndTypes,
-                static (spc, source) => Execute(source.Left, source.Right, spc));
-        }
-
-        private static RequestValidationModel? GetValidationModel(TypeScanResult scanResult)
-        {
-            var type = scanResult!.Type;
-            RequestValidationModel? result;
-            if (type is not null)
-            {
-                var props = type.GetAllProps();
-                if (props is not null)
+        var typeDeclarations = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                static (s, _) => s is ClassDeclarationSyntax,
+                static (ctx, _) =>
                 {
-                    var requestModel = new RequestValidationModel(type);
-                    foreach (var prop in props)
+                    var info = ctx.SemanticModel.GetDeclaredSymbol(ctx.Node);
+                    var type = info as ITypeSymbol;
+                    TypeScanResult? result;
+                    if (type is not null && type.IsConcreate())
                     {
-                        var attributes = prop.GetAttributes();
-                        requestModel.PropertyToSupportedAttributes.Add(prop, attributes);
+                        result = new(type,
+                            type.IsImplementing(IREQUEST_INTERFACE_NAME, IREQUEST_INTERFACE_NAMESPACE));
                     }
-                    result = requestModel;
-                }
-                else
+                    else
+                    {
+                        result = null;
+                    }
+
+                    return result;
+                })
+            .Where(x => x is not null && x.ImplementsIRequest)
+            .Select((scanResult, _) => GetValidationModel(scanResult!))
+            .Where(x => x is not null)
+            .Select((x, _) => (x!));
+
+        var compilationAndTypes = context.CompilationProvider.Combine(typeDeclarations.Collect());
+
+        context.RegisterSourceOutput(compilationAndTypes,
+            static (spc, source) => Execute(source.Left, source.Right, spc));
+    }
+
+    private static RequestValidationModel? GetValidationModel(TypeScanResult scanResult)
+    {
+        var type = scanResult!.Type;
+        RequestValidationModel? result;
+        if (type is not null)
+        {
+            var props = type.GetAllProps();
+            if (props is not null)
+            {
+                var requestModel = new RequestValidationModel(type);
+                foreach (var prop in props)
                 {
-                    result = null;
+                    var attributes = prop.GetAttributes();
+                    requestModel.PropertyToSupportedAttributes.Add(prop, attributes);
                 }
+                result = requestModel;
             }
             else
             {
                 result = null;
             }
-            return result;
         }
-
-        private static void Execute(Compilation compilation,
-            ImmutableArray<RequestValidationModel> validationModels,
-            SourceProductionContext spc)
+        else
         {
-            List<Diagnostic> errors = new List<Diagnostic>();
-            foreach (var validationModel in validationModels)
-            {
-                var (sourceCode, errorMsgs) = RequestValidatorCreator.CreateValidatorFor(validationModel);
-                sourceCode = PrefixAsAutogenerated(sourceCode);
-                spc.AddSource($"{validationModel.ValidatorName}.g.cs", sourceCode);
-                errors.AddRange(CreateDiagnostics(validationModel, errorMsgs));
-            }
-
-            var (fileName, src) = RegistrationsCreator.CreateFor(validationModels);
-            spc.AddSource(src, fileName);
-
-            foreach (var error in errors)
-            {
-                spc.ReportDiagnostic(error);
-            }
+            result = null;
         }
+        return result;
+    }
 
-        private static IEnumerable<Diagnostic> CreateDiagnostics(RequestValidationModel validationModel, List<string> errorMsgs)
+    private static void Execute(Compilation compilation,
+        ImmutableArray<RequestValidationModel> validationModels,
+        SourceProductionContext spc)
+    {
+        List<Diagnostic> errors = new List<Diagnostic>();
+        foreach (var validationModel in validationModels)
         {
-            return errorMsgs.Select(errorMsg => CreateDiagnostic(validationModel, errorMsg));
+            var (sourceCode, errorMsgs) = RequestValidatorCreator.CreateValidatorFor(validationModel);
+            sourceCode = PrefixAsAutogenerated(sourceCode);
+            spc.AddSource($"{validationModel.ValidatorName}.g.cs", sourceCode);
+            errors.AddRange(CreateDiagnostics(validationModel, errorMsgs));
         }
 
-        private static Diagnostic CreateDiagnostic(RequestValidationModel validationModel, string? msg)
-        {
-            var request = validationModel.RequestClass;
-            var location = request.Locations.FirstOrDefault();
-            return Diagnostic.Create(DiagnosticDescriptors.FailedToCreateValidatorDescriptor, location, request.MetadataName, msg);
-        }
+        var (fileName, src) = RegistrationsCreator.CreateFor(validationModels);
+        spc.AddSource(src, fileName);
 
-        private static string PrefixAsAutogenerated(string source)
+        foreach (var error in errors)
         {
-            StringBuilder sourceBuilder = new StringBuilder();
-            sourceBuilder.AppendLine("// <auto-generated/>");
-            sourceBuilder.AppendLine();
-            sourceBuilder.Append(source);
-            return sourceBuilder.ToString();
+            spc.ReportDiagnostic(error);
         }
+    }
+
+    private static IEnumerable<Diagnostic> CreateDiagnostics(RequestValidationModel validationModel, List<string> errorMsgs)
+    {
+        return errorMsgs.Select(errorMsg => CreateDiagnostic(validationModel, errorMsg));
+    }
+
+    private static Diagnostic CreateDiagnostic(RequestValidationModel validationModel, string? msg)
+    {
+        var request = validationModel.RequestClass;
+        var location = request.Locations.FirstOrDefault();
+        return Diagnostic.Create(DiagnosticDescriptors.FailedToCreateValidatorDescriptor, location, request.MetadataName, msg);
+    }
+
+    private static string PrefixAsAutogenerated(string source)
+    {
+        StringBuilder sourceBuilder = new StringBuilder();
+        sourceBuilder.AppendLine("// <auto-generated/>");
+        sourceBuilder.AppendLine();
+        sourceBuilder.Append(source);
+        return sourceBuilder.ToString();
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace MediatR.ValidationGenerator.Builders
+﻿namespace MediatR.ValidationGenerator.Builders;
+
+public enum AccessModifier
 {
-    public enum AccessModifier
-    {
-        Public, Private, Protected, Internal
-    }
+    Public, Private, Protected, Internal
 }

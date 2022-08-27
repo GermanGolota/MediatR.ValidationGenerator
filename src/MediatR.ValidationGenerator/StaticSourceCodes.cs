@@ -1,10 +1,10 @@
 ﻿using static MediatR.ValidationGenerator.GlobalNames;
 
-namespace MediatR.ValidationGenerator
+namespace MediatR.ValidationGenerator;
+
+public static class StaticSourceCodes
 {
-    public static class StaticSourceCodes
-    {
-        public static readonly string ValidatorDefinition = @$"
+    public static readonly string ValidatorDefinition = @$"
 namespace {InternalNamespace}
 {{
     public interface {ValidatorLocal}<in T>
@@ -86,7 +86,7 @@ namespace {InternalNamespace}
 }}
 ";
 
-        public static readonly string Behavior = $@"
+    public static readonly string Behavior = $@"
 namespace {InternalNamespace}
 {{
     public class {ValidationBehaviorLocal}<TRequest, TResponse> : {PipelineBehavior}<TRequest, TResponse>
@@ -127,7 +127,7 @@ namespace {InternalNamespace}
 
 ";
 
-        public static readonly string DIExtensions = $@"
+    public static readonly string DIExtensions = $@"
 namespace {PublicNamespace}
 {{
     public static class DiExtensions
@@ -164,7 +164,7 @@ namespace {InternalNamespace}
 }}
 ";
 
-        public static readonly string Attributes = $@"
+    public static readonly string Attributes = $@"
 namespace {PublicNamespace}
 {{
     public class {CustomValidatorAttribute} : {Attribute}
@@ -180,7 +180,6 @@ namespace {PublicNamespace}
     }}                
 }}
 ";
-    }
 }
 
 
