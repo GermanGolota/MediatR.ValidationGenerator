@@ -1,11 +1,10 @@
-﻿namespace MediatR.ValidationGenerator.Tests
+﻿namespace MediatR.ValidationGenerator.Tests;
+
+public static class TestExtensions
 {
-    public static class TestExtensions
+    public static string RemoveFirstNewLine(this string str)
     {
-        public static string RemoveFirstNewLine(this string str)
-        {
-            return str.TrimStart('\r')
-                      .TrimStart('\n');
-        }
+        return str.TrimStart('\r')
+                  .TrimStart('\n');
     }
 }

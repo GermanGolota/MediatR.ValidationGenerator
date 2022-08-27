@@ -2,19 +2,18 @@
 using System.ComponentModel.DataAnnotations;
 using Xunit;
 
-namespace MediatR.ValidationGenerator.Tests.Rules
+namespace MediatR.ValidationGenerator.Tests.Rules;
+
+public class AttributeHelperTests
 {
-    public class AttributeHelperTests
+    [Fact]
+    public void GetName_ShouldRemoveAttributeFromAttributeName()
     {
-        [Fact]
-        public void GetName_ShouldRemoveAttributeFromAttributeName()
-        {
-            //Arrange
-            string expected = "Required";
-            //Act
-            bool result = AttributeHelper.IsTheSameAttribute(nameof(RequiredAttribute), expected);
-            //Assert
-            Assert.True(result);
-        }
+        //Arrange
+        string expected = "Required";
+        //Act
+        bool result = AttributeHelper.IsTheSameAttribute(nameof(RequiredAttribute), expected);
+        //Assert
+        Assert.True(result);
     }
 }

@@ -91,17 +91,25 @@ public class CustomValidatorRule : AttributeRule
     {
         var args = attribute.ConstructorArguments;
 
-        var typeVal = args[0].Value;
-        var methodName = args[1].Value;
         (ITypeSymbol? type, string? method) result;
-        if (typeVal is ITypeSymbol && methodName is string)
+        if (args.Length == 2)
         {
-            result = (typeVal as ITypeSymbol, methodName as string);
+            var typeVal = args[0].Value;
+            var methodName = args[1].Value;
+            if (typeVal is ITypeSymbol && methodName is string)
+            {
+                result = (typeVal as ITypeSymbol, methodName as string);
+            }
+            else
+            {
+                result = (null, null);
+            }
         }
         else
         {
             result = (null, null);
         }
+
         return result;
     }
 }

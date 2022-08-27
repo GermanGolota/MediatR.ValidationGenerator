@@ -10,6 +10,6 @@ public class DuplicateRequest : IRequest<string>
     [RegularExpression("[A-Z,a-z,0-9,-]")]
     public string Text { get; set; }
 
-    [CustomValidator(typeof(ICacheService), nameof(ICacheService.Has))]
+    //[CustomValidator(typeof(ICacheService), nameof(ICacheService.Has))]
     public string CachedValue { get; set; }
 }
