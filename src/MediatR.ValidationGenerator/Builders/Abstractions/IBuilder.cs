@@ -1,9 +1,6 @@
-﻿using MediatR.ValidationGenerator.Models;
+﻿namespace MediatR.ValidationGenerator.Builders.Abstractions;
 
-namespace MediatR.ValidationGenerator.Builders.Abstractions
+public interface IBuilder
 {
-    public interface IBuilder
-    {
-        public string Build();
-    }
+    public string Build();
 }

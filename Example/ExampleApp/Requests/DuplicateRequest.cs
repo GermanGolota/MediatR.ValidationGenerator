@@ -1,17 +1,14 @@
-﻿using ExampleApp.Services;
-using MediatR;
+﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
-using MediatR.ValidationGenerator;
 
-namespace ExampleApp.Requests
+namespace ExampleApp.Requests;
+
+public class DuplicateRequest : IRequest<string>
 {
-    public class DuplicateRequest : IRequest<string>
-    {
-        [Required]
-        [RegularExpression("[A-Z,a-z,0-9,-]")]
-        public string Text { get; set; }
+    [Required]
+    [RegularExpression("[A-Z,a-z,0-9,-]")]
+    public string Text { get; set; }
 
-        [CustomValidator(typeof(ICacheService), nameof(ICacheService.Has))]
-        public string CachedValue { get; set; }
-    }
+    //[CustomValidator(typeof(ICacheService), nameof(ICacheService.Has))]
+    public string CachedValue { get; set; }
 }

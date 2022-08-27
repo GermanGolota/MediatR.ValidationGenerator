@@ -1,27 +1,26 @@
 ﻿using MediatR.ValidationGenerator.Builders;
-using Xunit;
 
-namespace MediatR.ValidationGenerator.Tests.Builders
+namespace MediatR.ValidationGenerator.Tests.Builders;
+
+public class ClassBuilderTests
 {
-    public class ClassBuilderTests
+    [Fact]
+    public void Build_ShouldBuild_WithOneMethod()
     {
-        [Fact]
-        public void Build_ShouldBuild_WithOneMethod()
-        {
-            //Arrange
-            var builder = ClassBuilder.Create()
-                .WithClassName("Test")
-                .WithNamespace("TestNamespace")
-                .UsingNamespace("System")
-                .WithAccessModifier(AccessModifier.Public)
-                .WithMethod((builder) =>
-                {
-                    return builder
-                        .WithName("DoNothing")
-                        .WithReturnType("void")
-                        .WithModifier(AccessModifier.Public);
-                });
-            string expectedClass = @"
+        //Arrange
+        var builder = ClassBuilder.Create()
+            .WithClassName("Test")
+            .WithNamespace("TestNamespace")
+            .UsingNamespace("System")
+            .WithAccessModifier(AccessModifier.Public)
+            .WithMethod((builder) =>
+            {
+                return builder
+                    .WithName("DoNothing")
+                    .WithReturnType("void")
+                    .WithModifier(AccessModifier.Public);
+            });
+        string expectedClass = @"
 using System;
 
 namespace TestNamespace
@@ -34,32 +33,32 @@ namespace TestNamespace
     }
 }
 ".RemoveFirstNewLine();
-            //Act
-            var actualClass = builder.Build();
-            //Assert
-            Assert.Equal(expectedClass, actualClass);
-        }
+        //Act
+        var actualClass = builder.Build();
+        //Assert
+        Assert.Equal(expectedClass, actualClass);
+    }
 
 
-        [Fact]
-        public void Build_ShouldBuild_WithFieldsAndCtor()
-        {
-            //Arrange
-            var builder = ClassBuilder.Create()
-                .WithClassName("DomainModelNameService")
-                .WithNamespace("Application")
-                .Implementing("IDomainModelNameService")
-                .UsingNamespace("System")
-                .UsingNamespace("Microsoft.Extensions.Caching.Abstractions")
-                .WithAccessModifier(AccessModifier.Public)
-                .WithField(new FieldModel("_cache", "IMemoryCache"))
-                .WithConstructor((ctor) =>
-                    ctor
-                        .WithModifier(AccessModifier.Public)
-                        .WithParameter("IMemoryCache", "cache")
-                        .WithBody(body => body.AppendLine("_cache = cache"))
-                );
-            string expectedClass = @"
+    [Fact]
+    public void Build_ShouldBuild_WithFieldsAndCtor()
+    {
+        //Arrange
+        var builder = ClassBuilder.Create()
+            .WithClassName("DomainModelNameService")
+            .WithNamespace("Application")
+            .Implementing("IDomainModelNameService")
+            .UsingNamespace("System")
+            .UsingNamespace("Microsoft.Extensions.Caching.Abstractions")
+            .WithAccessModifier(AccessModifier.Public)
+            .WithField(new FieldModel("_cache", "IMemoryCache"))
+            .WithConstructor((ctor) =>
+                ctor
+                    .WithModifier(AccessModifier.Public)
+                    .WithParameter("IMemoryCache", "cache")
+                    .WithBody(body => body.AppendLine("_cache = cache"))
+            );
+        string expectedClass = @"
 using System;
 using Microsoft.Extensions.Caching.Abstractions;
 
@@ -76,10 +75,9 @@ namespace Application
     }
 }
 ".RemoveFirstNewLine();
-            //Act
-            var actualClass = builder.Build();
-            //Assert
-            Assert.Equal(expectedClass, actualClass);
-        }
+        //Act
+        var actualClass = builder.Build();
+        //Assert
+        Assert.Equal(expectedClass, actualClass);
     }
 }

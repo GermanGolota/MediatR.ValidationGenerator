@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MediatR.ValidationGenerator.Rules
+namespace MediatR.ValidationGenerator.Rules;
+
+public abstract class AttributeRuleNoServices : AttributeRule
 {
-    public abstract class AttributeRuleNoServices : AttributeRule
+    public override IEnumerable<ITypeSymbol> GetRequiredServices(AttributeData attribute)
     {
-        public override IEnumerable<ITypeSymbol> GetRequiredServices(AttributeData attribute)
-        {
-            return Enumerable.Empty<ITypeSymbol>();
-        }
+        return Enumerable.Empty<ITypeSymbol>();
     }
 }

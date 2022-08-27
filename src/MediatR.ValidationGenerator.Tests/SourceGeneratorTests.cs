@@ -1,24 +1,20 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using Xunit;
 
-namespace MediatR.ValidationGenerator.Tests
+namespace MediatR.ValidationGenerator.Tests;
+
+public class SourceGeneratorTests
 {
-    public class SourceGeneratorTests
+    [Fact]
+    public void Execute_ShouldNotThrow_WhenRequestsExist()
     {
-        [Fact]
-        public void Execute_ShouldNotThrow_WhenRequestsExist()
+        //Arrange
+        #region SourceCodes
+        List<string> sources = new List<string>
         {
-            //Arrange
-            #region SourceCodes
-            List<string> sources = new List<string>
-            {
-                @"
+            @"
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -31,7 +27,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
     }
 }
 ",
-                @"
+            @"
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -45,7 +41,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
     }
 }
 ",
-                @"
+            @"
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,7 +62,7 @@ namespace MediatR.ValidationGenerator.Gen.Tests.TestCommands
     }
 },
 ",
-                @"
+            @"
 namespace MediatR.ValidationGenerator.Gen.Tests
 {
     public static class Program
@@ -76,53 +72,52 @@ namespace MediatR.ValidationGenerator.Gen.Tests
     }
 }
 "
-            };
-            #endregion
-            Compilation inputCompilation = CreateCompilation(sources);
-            var generator = new ValidatorsGenerator();
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-            //Act
-            driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-            GeneratorDriverRunResult result = driver.GetRunResult();
-            //Assert
-            Assert.Empty(diagnostics);
-            Assert.Empty(result.Diagnostics);
-            Assert.NotEmpty(result.GeneratedTrees);
-        }
+        };
+        #endregion
+        Compilation inputCompilation = CreateCompilation(sources);
+        var generator = new ValidatorsGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        //Act
+        driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+        GeneratorDriverRunResult result = driver.GetRunResult();
+        //Assert
+        Assert.Empty(diagnostics);
+        Assert.Empty(result.Diagnostics);
+        Assert.NotEmpty(result.GeneratedTrees);
+    }
 
-        private static Compilation CreateCompilation(List<string> sources)
+    private static Compilation CreateCompilation(List<string> sources)
+    {
+        var types = new[] {
+            typeof(Binder),
+            typeof(IBaseRequest),
+            typeof(RegularExpressionAttribute)
+        };
+
+        var locations = types.Select(x => x.GetTypeInfo().Assembly.Location)
+            .Union(GetStandardAssemblies())
+            .Distinct();
+
+        var references = locations.Select(location => MetadataReference.CreateFromFile(location));
+        var sourceTrees = sources.Select(source => CSharpSyntaxTree.ParseText(source));
+        return CSharpCompilation.Create("compilation",
+            sourceTrees,
+            references,
+            new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+    }
+
+    private static IEnumerable<string> GetStandardAssemblies()
+    {
+        //TODO: Replace with Assembly.Load
+        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+        var standardAssemblyNames = new[]
         {
-            var types = new[] {
-                typeof(Binder),
-                typeof(IBaseRequest),
-                typeof(RegularExpressionAttribute)
-            };
-
-            var locations = types.Select(x => x.GetTypeInfo().Assembly.Location)
-                .Union(GetStandardAssemblies())
-                .Distinct();
-
-            var references = locations.Select(location => MetadataReference.CreateFromFile(location));
-            var sourceTrees = sources.Select(source => CSharpSyntaxTree.ParseText(source));
-            return CSharpCompilation.Create("compilation",
-                sourceTrees,
-                references,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-        }
-
-        private static IEnumerable<string> GetStandardAssemblies()
-        {
-            //TODO: Replace with Assembly.Load
-            var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            var standardAssemblyNames = new[]
-            {
-                 "mscorlib.dll",
-                 "System.dll",
-                 "System.Core.dll",
-                 "System.Runtime.dll",
-                 "netstandard.dll"
-            };
-            return standardAssemblyNames.Select(x => Path.Combine(assemblyPath, x));
-        }
+             "mscorlib.dll",
+             "System.dll",
+             "System.Core.dll",
+             "System.Runtime.dll",
+             "netstandard.dll"
+        };
+        return standardAssemblyNames.Select(x => Path.Combine(assemblyPath, x));
     }
 }
