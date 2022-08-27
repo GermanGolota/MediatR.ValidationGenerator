@@ -1,6 +1,5 @@
 ﻿using MediatR.ValidationGenerator.Rules;
 using System.ComponentModel.DataAnnotations;
-using Xunit;
 
 namespace MediatR.ValidationGenerator.Tests.Rules;
 

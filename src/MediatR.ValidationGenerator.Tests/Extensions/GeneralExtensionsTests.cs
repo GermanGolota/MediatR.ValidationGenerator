@@ -1,7 +1,4 @@
 ﻿using MediatR.ValidationGenerator.Extensions;
-using System;
-using System.Linq;
-using Xunit;
 
 namespace MediatR.ValidationGenerator.Tests.Extensions;
 

@@ -1,5 +1,4 @@
-﻿using ExampleApp.Services;
-using MediatR;
+﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
 
 namespace ExampleApp.Requests;

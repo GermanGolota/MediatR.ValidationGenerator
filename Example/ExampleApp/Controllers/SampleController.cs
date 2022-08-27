@@ -1,7 +1,6 @@
 ﻿using ExampleApp.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace ExampleApp.Controllers;
 

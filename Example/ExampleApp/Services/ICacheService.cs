@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace ExampleApp.Services;
+﻿namespace ExampleApp.Services;
 
 public interface ICacheService
 {

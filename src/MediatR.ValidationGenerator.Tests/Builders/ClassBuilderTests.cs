@@ -1,5 +1,4 @@
 ﻿using MediatR.ValidationGenerator.Builders;
-using Xunit;
 
 namespace MediatR.ValidationGenerator.Tests.Builders;
 

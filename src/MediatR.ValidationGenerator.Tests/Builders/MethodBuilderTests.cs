@@ -1,6 +1,5 @@
 ﻿using MediatR.ValidationGenerator.Builders;
 using MediatR.ValidationGenerator.Models;
-using Xunit;
 
 namespace MediatR.ValidationGenerator.Tests.Builders;
 
